@@ -9,8 +9,8 @@ book:
   author: "Jeremy Howard and Sylvain Gugger"
   chapters:
     - index.qmd
-    - production.ipynb
     - intro.ipynb
+    - production.ipynb
     - ethics.ipynb
     - mnist_basics.ipynb
     - pet_breeds.ipynb
