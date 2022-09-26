@@ -10,27 +10,39 @@ book:
   chapters:
     - index.qmd
     - intro.ipynb
-    - production.ipynb
-    - ethics.ipynb
+      #- production.ipynb
+    - book.qmd
+      #- ethics.ipynb
+    - book.qmd
     - mnist_basics.ipynb
-    - pet_breeds.ipynb
-    - multicat.ipynb
-    - sizing_and_tta.ipynb
-    - collab.ipynb
-    - tabular.ipynb
-    - nlp.ipynb
-    - midlevel_data.ipynb
-    - nlp_dive.ipynb
+      #- pet_breeds.ipynb
+    - book.qmd
+      #- multicat.ipynb
+    - book.qmd
+      #- sizing_and_tta.ipynb
+    - book.qmd
+      #- collab.ipynb
+    - book.qmd
+      #- tabular.ipynb
+    - book.qmd
+      #- nlp.ipynb
+    - book.qmd
+      #- midlevel_data.ipynb
+    - book.qmd
+      #- nlp_dive.ipynb
+    - book.qmd
     - convolutions.ipynb
     - resnet.ipynb
-    - arch_details.ipynb
+      #- arch_details.ipynb
+    - book.qmd
     - accel_sgd.ipynb
     - foundations.ipynb
-    - CAM.ipynb
-    - learner.ipynb
-    - conclusion.ipynb
-    - app_blog.ipynb
-    - app_jupyter.ipynb
+      #- CAM.ipynb
+      #- learner.ipynb
+      #- conclusion.ipynb
+  #appendices: 
+    #- app_blog.ipynb
+    #- app_jupyter.ipynb
 
 bibliography: references.bib
 
