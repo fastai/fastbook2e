@@ -1,0 +1,42 @@
+project:
+  type: book
+  preview:
+    port: 3000
+    browser: false
+
+book:
+  title: "Practical Deep Learning for Coders, 2nd Ed (Preview)"
+  author: "Jeremy Howard and Sylvain Gugger"
+  chapters:
+    - index.qmd
+    - production.ipynb
+    - intro.ipynb
+    - ethics.ipynb
+    - mnist_basics.ipynb
+    - pet_breeds.ipynb
+    - multicat.ipynb
+    - sizing_and_tta.ipynb
+    - collab.ipynb
+    - tabular.ipynb
+    - nlp.ipynb
+    - midlevel_data.ipynb
+    - nlp_dive.ipynb
+    - convolutions.ipynb
+    - resnet.ipynb
+    - arch_details.ipynb
+    - accel_sgd.ipynb
+    - foundations.ipynb
+    - CAM.ipynb
+    - learner.ipynb
+    - conclusion.ipynb
+    - app_blog.ipynb
+    - app_jupyter.ipynb
+
+bibliography: references.bib
+
+format:
+  html:
+    theme: cosmo
+  pdf:
+    documentclass: scrreprt
+

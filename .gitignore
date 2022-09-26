@@ -1,3 +1,6 @@
+*.swp
+_book/
+/.quarto/
 .gitattributes
 models/
 tmp/
