@@ -2,7 +2,7 @@
 
 We are now in the exciting position that we can fully understand the architectures that we have been using for our state-of-the-art models for computer vision, natural language processing, and tabular analysis. In this chapter, we're going to fill in all the missing details on how fastai's application models work and show you how to build the models they use.
 
-We will also go back to the custom data preprocessing pipeline we saw in <<chapter_midlevel_data>> for Siamese networks and show you how you can use the components in the fastai library to build custom pretrained models for new tasks.
+We will also go back to the custom data preprocessing pipeline we saw in @sec-midlevel-data for Siamese networks and show you how you can use the components in the fastai library to build custom pretrained models for new tasks.
 
 We'll start with computer vision.
 

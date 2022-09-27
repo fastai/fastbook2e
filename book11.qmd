@@ -4,7 +4,7 @@ We have seen what `Tokenizer` and `Numericalize` do to a collection of texts, an
 
 ## Going Deeper into fastai's Layered API
 
-The fastai library is built on a *layered API*. In the very top layer there are *applications* that allow us to train a model in five lines of codes, as we saw in <<chapter_intro>>. In the case of creating `DataLoaders` for a text classifier, for instance, we used the line:
+The fastai library is built on a *layered API*. In the very top layer there are *applications* that allow us to train a model in five lines of codes, as we saw in @sec-intro. In the case of creating `DataLoaders` for a text classifier, for instance, we used the line:
 
 ```python
 from fastai.text.all import *
