@@ -15,8 +15,8 @@ book:
   author: "Jeremy Howard and Sylvain Gugger"
   site-url: https://fastai.github.io/fastbook2e
   twitter-card:
-    creator: "@jeremyphoward"
-    site: "@fastdotai"
+    creator: "jeremyphoward"
+    site: "fastdotai"
   open-graph: true
   chapters:
     - index.qmd
