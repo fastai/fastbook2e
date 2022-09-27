@@ -3,6 +3,8 @@ project:
   preview:
     port: 3000
     browser: false
+
+website:
   twitter-card:
     creator: "@jeremyphoward"
     site: "@fastdotai"

@@ -1,3 +1,12 @@
+---
+twitter-card:
+  creator: "jeremyphoward"
+  site: "fastdotai"
+  image: /images/dl4c.jpg
+open-graph:
+  image: /images/dl4c.jpg
+---
+
 # Preface {.unnumbered}
 
 This is a preview version of [Deep Learning for Coders with Fastai and PyTorch: AI Applications Without a PhD](https://www.amazon.com/Deep-Learning-Coders-fastai-PyTorch/dp/1492045527). Note that chapters shown in *italics* in the sidebar are only available as a preview of the first few paragraphs. The full content of all chapters is available for free as Jupyter Notebooks [here](https://github.com/fastai/fastbook/) with only basic formatting. A nicely typeset version can be purchased [from Amazon](https://www.amazon.com/Deep-Learning-Coders-fastai-PyTorch/dp/1492045527).
