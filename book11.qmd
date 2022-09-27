@@ -1,4 +1,4 @@
-# *Data Munging with fastai's Mid-Level API*  {#sec-midlevel_data}
+# *Data Munging with fastai's Mid-Level API*  {#sec-midlevel-data}
 
 We have seen what `Tokenizer` and `Numericalize` do to a collection of texts, and how they're used inside the data block API, which handles those transforms for us directly using the `TextBlock`. But what if we want to only apply one of those transforms, either to see intermediate results or because we have already tokenized texts? More generally, what can we do when the data block API is not flexible enough to accommodate our particular use case? For this, we need to use fastai's *mid-level API* for processing data. The data block API is built on top of that layer, so it will allow you to do everything the data block API does, and much much more.
 

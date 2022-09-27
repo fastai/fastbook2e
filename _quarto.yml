@@ -4,6 +4,12 @@ project:
     port: 3000
     browser: false
 
+format:
+  html:
+    number-depth: 2
+    theme: cosmo
+    css: styles.css
+
 book:
   title: "Practical Deep Learning for Coders, 2nd Ed (Preview)"
   author: "Jeremy Howard and Sylvain Gugger"
@@ -54,8 +60,4 @@ book:
       #- app_jupyter.ipynb
 
 bibliography: references.bib
-
-format:
-  html:
-    theme: cosmo
 

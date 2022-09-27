@@ -1,4 +1,4 @@
-# *A Language Model from Scratch*  {#sec-nlp_dive}
+# *A Language Model from Scratch*  {#sec-nlp-dive}
 
 We're now ready to go deep... deep into deep learning! You already learned how to train a basic neural network, but how do you go from there to creating state-of-the-art models? In this part of the book we're going to uncover all of the mysteries, starting with language models.
 

@@ -1,4 +1,4 @@
-# *Training a State-of-the-Art Model*  {#sec-sizing_and_tta}
+# *Training a State-of-the-Art Model*  {#sec-sizing-and-tta}
 
 This chapter introduces more advanced techniques for training an image classification model and getting state-of-the-art results. You can skip it if you want to learn more about other applications of deep learning and come back to it later—knowledge of this material will not be assumed in later chapters.
 
