@@ -3,6 +3,12 @@ project:
   preview:
     port: 3000
     browser: false
+  twitter-card:
+    creator: "@jeremyphoward"
+    site: "@fastdotai"
+    image: /images/dl4c.jpg
+  open-graph:
+    image: /images/dl4c.jpg
 
 format:
   html:
