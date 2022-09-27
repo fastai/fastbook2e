@@ -4,14 +4,6 @@ project:
     port: 3000
     browser: false
 
-website:
-  twitter-card:
-    creator: "@jeremyphoward"
-    site: "@fastdotai"
-    image: /images/dl4c.jpg
-  open-graph:
-    image: /images/dl4c.jpg
-
 format:
   html:
     number-depth: 2
@@ -21,6 +13,13 @@ format:
 book:
   title: "Practical Deep Learning for Coders"
   author: "Jeremy Howard and Sylvain Gugger"
+  site-url: https://fastai.github.io/fastbook2e
+  twitter-card:
+    creator: "@jeremyphoward"
+    site: "@fastdotai"
+    image: /images/dl4c.jpg
+  open-graph:
+    image: /images/dl4c.jpg
   chapters:
     - index.qmd
     - part: "Getting Started"
