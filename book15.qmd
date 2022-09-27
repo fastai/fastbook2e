@@ -1,0 +1,22 @@
+# *Application Architectures Deep Dive*  {#sec-arch_details}
+
+We are now in the exciting position that we can fully understand the architectures that we have been using for our state-of-the-art models for computer vision, natural language processing, and tabular analysis. In this chapter, we're going to fill in all the missing details on how fastai's application models work and show you how to build the models they use.
+
+We will also go back to the custom data preprocessing pipeline we saw in <<chapter_midlevel_data>> for Siamese networks and show you how you can use the components in the fastai library to build custom pretrained models for new tasks.
+
+We'll start with computer vision.
+
+## Computer Vision
+
+For computer vision application we use the functions `vision_learner` and `unet_learner` to build our models, depending on the task. In this section we'll explore how to build the `Learner` objects we used in Parts 1 and 2 of this book.
+
+### vision_learner
+
+Let's take a look at what happens when we use the `vision_learner` function. We begin by passing this function an architecture to use for the *body* of the network. Most of the time we use a ResNet, which you already know how to create, so we don't need to delve into that any further. Pretrained weights are downloaded as required and loaded into the ResNet.
+
+Then, for transfer learning, the network needs to be *cut*. This refers to slicing off the final layer, which is only responsible for ImageNet-specific categorization. In fact, we do not slice off only this layer, but everything from the adaptive average pooling layer onwards. The reason for this will become clear in just a moment. Since different architectures might use different types of pooling layers, or even completely different kinds of *heads*, we don't just search for the adaptive pooling layer to decide where to cut the pretrained model. Instead, we have a dictionary of information that is used for each model to determine where its body ends, and its head starts.
+
+---
+
+This is just a preview of this chapter. The rest of this chapter is not available here, but you read the [source notebook](https://github.com/fastai/fastbook/) which has the same content (but with less nice formatting).
+

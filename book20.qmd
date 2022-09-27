@@ -1,0 +1,12 @@
+# *Concluding Thoughts*  {#sec-conclusion}
+
+Congratulations! You've made it! If you have worked through all of the notebooks to this point, then you have joined the small, but growing group of people that are able to harness the power of deep learning to solve real problems. You may not feel that way yet—in fact you probably don't. We have seen again and again that students that complete the fast.ai courses dramatically underestimate how effective they are as deep learning practitioners. We've also seen that these people are often underestimated by others with a classic academic background. So if you are to rise above your own expectations and the expectations of others, what you do next, after closing this book, is even more important than what you've done to get to this point.
+
+The most important thing is to keep the momentum going. In fact, as you know from your study of optimizers, momentum is something that can build upon itself! So think about what you can do now to maintain and accelerate your deep learning journey. <<do_next>> can give you a few ideas.
+
+![What to do next](images/att_00053.png){width="550" id="do_next" fig-alt="What to do next"}
+
+---
+
+This is just a preview of this chapter. The rest of this chapter is not available here, but you read the [source notebook](https://github.com/fastai/fastbook/) which has the same content (but with less nice formatting).
+

@@ -9,40 +9,49 @@ book:
   author: "Jeremy Howard and Sylvain Gugger"
   chapters:
     - index.qmd
-    - intro.ipynb
-      #- production.ipynb
-    - book.qmd
-      #- ethics.ipynb
-    - book.qmd
-    - mnist_basics.ipynb
-      #- pet_breeds.ipynb
-    - book.qmd
-      #- multicat.ipynb
-    - book.qmd
-      #- sizing_and_tta.ipynb
-    - book.qmd
-      #- collab.ipynb
-    - book.qmd
-      #- tabular.ipynb
-    - book.qmd
-      #- nlp.ipynb
-    - book.qmd
-      #- midlevel_data.ipynb
-    - book.qmd
-      #- nlp_dive.ipynb
-    - book.qmd
-    - convolutions.ipynb
-    - resnet.ipynb
-      #- arch_details.ipynb
-    - book.qmd
-    - accel_sgd.ipynb
-    - foundations.ipynb
-      #- CAM.ipynb
-      #- learner.ipynb
-      #- conclusion.ipynb
-  #appendices: 
-    #- app_blog.ipynb
-    #- app_jupyter.ipynb
+    - part: "Getting Started"
+      chapters:
+      - intro.ipynb
+        #- production.ipynb
+      - book2.qmd
+        #- ethics.ipynb
+      - book3.qmd
+    - part: "The Details"
+      chapters:
+      - mnist_basics.ipynb
+        #- pet_breeds.ipynb
+      - book5.qmd
+        #- multicat.ipynb
+      - book6.qmd
+        #- sizing_and_tta.ipynb
+      - book7.qmd
+        #- collab.ipynb
+      - book8.qmd
+        #- tabular.ipynb
+      - book9.qmd
+        #- nlp.ipynb
+      - book10.qmd
+    - part: "From the Foundations"
+      chapters:
+        #- midlevel_data.ipynb
+      - book11.qmd
+        #- nlp_dive.ipynb
+      - book12.qmd
+      - convolutions.ipynb
+      - resnet.ipynb
+        #- arch_details.ipynb
+      - book15.qmd
+      - accel_sgd.ipynb
+      - foundations.ipynb
+        #- CAM.ipynb
+      - book18.qmd
+        #- learner.ipynb
+      - book19.qmd
+        #- conclusion.ipynb
+      - book20.qmd
+    #appendices: 
+      #- app_blog.ipynb
+      #- app_jupyter.ipynb
 
 bibliography: references.bib
 

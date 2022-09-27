@@ -1,4 +1,0 @@
-# Not available
-
-This chapter is not available here, but you read the [source notebook](https://github.com/fastai/fastbook/) which has the same content (but with less nice formatting).
-
