@@ -4,3 +4,12 @@ This is an early version of the second edition of [Deep Learning for Coders with
 
 Note that chapters shown in *italics* in the sidebar are only available as a preview of the first few paragraphs. The full content of the first edition is available for free as Jupyter Notebooks [here](https://github.com/fastai/fastbook/) with only basic formatting. A nicely typeset version can be purchased [from Amazon](https://www.amazon.com/Deep-Learning-Coders-fastai-PyTorch/dp/1492045527).
 
+Here's a list of all the full chapters available here:
+
+- @sec-intro:  Your Deep Learning Journey
+- @sec-mnist-basics: Under the Hood: Training a Digit Classifier
+- @sec-convolutions: Convolutional Neural Networks
+- @sec-resnet: ResNets
+- @sec-accel-sgd: The Training Process
+- @sec-foundations: A Neural Net from the Foundations
+
