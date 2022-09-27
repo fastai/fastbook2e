@@ -11,7 +11,7 @@ format:
     css: styles.css
 
 book:
-  title: "Practical Deep Learning for Coders, 2nd Ed (Preview)"
+  title: "Practical Deep Learning for Coders"
   author: "Jeremy Howard and Sylvain Gugger"
   chapters:
     - index.qmd

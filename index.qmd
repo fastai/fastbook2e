@@ -1,8 +1,6 @@
 # Preface {.unnumbered}
 
-This is an early version of the second edition of [Deep Learning for Coders with Fastai and PyTorch: AI Applications Without a PhD](https://www.amazon.com/Deep-Learning-Coders-fastai-PyTorch/dp/1492045527). Most of it hasn't been updated from the first edition yet -- the content here now is largely just copied from the first edition.
-
-Note that chapters shown in *italics* in the sidebar are only available as a preview of the first few paragraphs. The full content of the first edition is available for free as Jupyter Notebooks [here](https://github.com/fastai/fastbook/) with only basic formatting. A nicely typeset version can be purchased [from Amazon](https://www.amazon.com/Deep-Learning-Coders-fastai-PyTorch/dp/1492045527).
+This is a preview version of [Deep Learning for Coders with Fastai and PyTorch: AI Applications Without a PhD](https://www.amazon.com/Deep-Learning-Coders-fastai-PyTorch/dp/1492045527). Note that chapters shown in *italics* in the sidebar are only available as a preview of the first few paragraphs. The full content of all chapters is available for free as Jupyter Notebooks [here](https://github.com/fastai/fastbook/) with only basic formatting. A nicely typeset version can be purchased [from Amazon](https://www.amazon.com/Deep-Learning-Coders-fastai-PyTorch/dp/1492045527).
 
 Here's a list of all the full chapters available here:
 
@@ -12,4 +10,8 @@ Here's a list of all the full chapters available here:
 - @sec-resnet: ResNets
 - @sec-accel-sgd: The Training Process
 - @sec-foundations: A Neural Net from the Foundations
+
+This book is designed to go with our free deep learning course, available at [course.fast.ai](https://course.fast.ai).
+
+Once you've finished the first eight chapters of the book, or completed course.fast.ai, you'll be ready for our new course, [From Deep Learning Foundations to Stable Diffusion](https://www.fast.ai/posts/part2-2022.html), which starts on Oct 11th 2022 (Australian time; Oct 10th US time). You can sign up [here](https://itee.uq.edu.au/event/2022/practical-deep-learning-coders-uq-fastai-part-2). If you're an open source author you may qualify for a scholarship -- [details here](https://www.fast.ai/posts/part2-2022-signup.html).
 
