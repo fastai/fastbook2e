@@ -1,4 +1,4 @@
-# *AI and Data Ethics*  {#sec-ethics}
+# AI and Data Ethics  {#sec-ethics}
 
 ### Sidebar: Acknowledgement: Dr. Rachel Thomas
 
