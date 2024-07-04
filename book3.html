@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.1">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>3&nbsp; AI and Data Ethics – Practical Deep Learning for Coders</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./mnist_basics.html" rel="next">
+<link href="./book2.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="styles.css">
+<meta property="og:title" content="3&nbsp; AI and Data Ethics – Practical Deep Learning for Coders">
+<meta property="og:description" content="">
+<meta property="og:site_name" content="Practical Deep Learning for Coders">
+<meta name="twitter:title" content="3&nbsp; AI and Data Ethics – Practical Deep Learning for Coders">
+<meta name="twitter:description" content="">
+<meta name="twitter:creator" content="jeremyphoward">
+<meta name="twitter:site" content="fastdotai">
+<meta name="twitter:card" content="summary">
+</head>
+
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./intro.html">Getting Started</a></li><li class="breadcrumb-item"><a href="./book3.html"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">AI and Data Ethics</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Practical Deep Learning for Coders</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Getting Started</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./intro.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Your Deep Learning Journey</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./book2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title"><em>From Model to Production</em></span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./book3.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">AI and Data Ethics</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">The Details</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mnist_basics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Under the Hood: Training a Digit Classifier</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./book5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title"><em>Image Classification</em></span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./book6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title"><em>Other Computer Vision Problems</em></span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./book7.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title"><em>Training a State-of-the-Art Model</em></span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./book8.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title"><em>Collaborative Filtering Deep Dive</em></span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./book9.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title"><em>Tabular Modeling Deep Dive</em></span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./book10.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title"><em>NLP Deep Dive: RNNs</em></span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">From the Foundations</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./book11.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title"><em>Data Munging with fastai’s Mid-Level API</em></span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./book12.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title"><em>A Language Model from Scratch</em></span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./convolutions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Convolutional Neural Networks</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./resnet.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">ResNets</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./book15.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title"><em>Application Architectures Deep Dive</em></span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accel_sgd.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">The Training Process</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./foundations.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">A Neural Net from the Foundations</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./book18.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title"><em>CNN Interpretation with CAM</em></span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./book19.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title"><em>A fastai Learner from Scratch</em></span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./book20.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title"><em>Concluding Thoughts</em></span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#sidebar-acknowledgement-dr.-rachel-thomas" id="toc-sidebar-acknowledgement-dr.-rachel-thomas" class="nav-link active" data-scroll-target="#sidebar-acknowledgement-dr.-rachel-thomas">Sidebar: Acknowledgement: Dr.&nbsp;Rachel Thomas</a></li>
+  <li><a href="#end-sidebar" id="toc-end-sidebar" class="nav-link" data-scroll-target="#end-sidebar">End sidebar</a></li>
+  <li><a href="#key-examples-for-data-ethics" id="toc-key-examples-for-data-ethics" class="nav-link" data-scroll-target="#key-examples-for-data-ethics"><span class="header-section-number">3.1</span> Key Examples for Data Ethics</a>
+  <ul class="collapse">
+  <li><a href="#bugs-and-recourse-buggy-algorithm-used-for-healthcare-benefits" id="toc-bugs-and-recourse-buggy-algorithm-used-for-healthcare-benefits" class="nav-link" data-scroll-target="#bugs-and-recourse-buggy-algorithm-used-for-healthcare-benefits">Bugs and Recourse: Buggy Algorithm Used for Healthcare Benefits</a></li>
+  <li><a href="#feedback-loops-youtubes-recommendation-system" id="toc-feedback-loops-youtubes-recommendation-system" class="nav-link" data-scroll-target="#feedback-loops-youtubes-recommendation-system">Feedback Loops: YouTube’s Recommendation System</a></li>
+  <li><a href="#bias-professor-latanya-sweeney-arrested" id="toc-bias-professor-latanya-sweeney-arrested" class="nav-link" data-scroll-target="#bias-professor-latanya-sweeney-arrested">Bias: Professor Latanya Sweeney “Arrested”</a></li>
+  <li><a href="#why-does-this-matter" id="toc-why-does-this-matter" class="nav-link" data-scroll-target="#why-does-this-matter">Why Does This Matter?</a></li>
+  </ul></li>
+  <li><a href="#integrating-machine-learning-with-product-design" id="toc-integrating-machine-learning-with-product-design" class="nav-link" data-scroll-target="#integrating-machine-learning-with-product-design"><span class="header-section-number">3.2</span> Integrating Machine Learning with Product Design</a></li>
+  <li><a href="#topics-in-data-ethics" id="toc-topics-in-data-ethics" class="nav-link" data-scroll-target="#topics-in-data-ethics"><span class="header-section-number">3.3</span> Topics in Data Ethics</a>
+  <ul class="collapse">
+  <li><a href="#recourse-and-accountability" id="toc-recourse-and-accountability" class="nav-link" data-scroll-target="#recourse-and-accountability">Recourse and Accountability</a></li>
+  <li><a href="#feedback-loops" id="toc-feedback-loops" class="nav-link" data-scroll-target="#feedback-loops">Feedback Loops</a></li>
+  <li><a href="#bias" id="toc-bias" class="nav-link" data-scroll-target="#bias">Bias</a></li>
+  <li><a href="#addressing-different-types-of-bias" id="toc-addressing-different-types-of-bias" class="nav-link" data-scroll-target="#addressing-different-types-of-bias">Addressing different types of bias</a></li>
+  <li><a href="#disinformation" id="toc-disinformation" class="nav-link" data-scroll-target="#disinformation">Disinformation</a></li>
+  </ul></li>
+  <li><a href="#identifying-and-addressing-ethical-issues" id="toc-identifying-and-addressing-ethical-issues" class="nav-link" data-scroll-target="#identifying-and-addressing-ethical-issues"><span class="header-section-number">3.4</span> Identifying and Addressing Ethical Issues</a>
+  <ul class="collapse">
+  <li><a href="#analyze-a-project-you-are-working-on" id="toc-analyze-a-project-you-are-working-on" class="nav-link" data-scroll-target="#analyze-a-project-you-are-working-on">Analyze a Project You Are Working On</a></li>
+  <li><a href="#processes-to-implement" id="toc-processes-to-implement" class="nav-link" data-scroll-target="#processes-to-implement">Processes to Implement</a></li>
+  <li><a href="#the-power-of-diversity" id="toc-the-power-of-diversity" class="nav-link" data-scroll-target="#the-power-of-diversity">The Power of Diversity</a></li>
+  <li><a href="#fairness-accountability-and-transparency" id="toc-fairness-accountability-and-transparency" class="nav-link" data-scroll-target="#fairness-accountability-and-transparency">Fairness, Accountability, and Transparency</a></li>
+  </ul></li>
+  <li><a href="#role-of-policy" id="toc-role-of-policy" class="nav-link" data-scroll-target="#role-of-policy"><span class="header-section-number">3.5</span> Role of Policy</a>
+  <ul class="collapse">
+  <li><a href="#the-effectiveness-of-regulation" id="toc-the-effectiveness-of-regulation" class="nav-link" data-scroll-target="#the-effectiveness-of-regulation">The Effectiveness of Regulation</a></li>
+  <li><a href="#rights-and-policy" id="toc-rights-and-policy" class="nav-link" data-scroll-target="#rights-and-policy">Rights and Policy</a></li>
+  <li><a href="#cars-a-historical-precedent" id="toc-cars-a-historical-precedent" class="nav-link" data-scroll-target="#cars-a-historical-precedent">Cars: A Historical Precedent</a></li>
+  </ul></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion"><span class="header-section-number">3.6</span> Conclusion</a></li>
+  <li><a href="#questionnaire" id="toc-questionnaire" class="nav-link" data-scroll-target="#questionnaire"><span class="header-section-number">3.7</span> Questionnaire</a>
+  <ul class="collapse">
+  <li><a href="#further-research" id="toc-further-research" class="nav-link" data-scroll-target="#further-research">Further Research:</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./intro.html">Getting Started</a></li><li class="breadcrumb-item"><a href="./book3.html"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">AI and Data Ethics</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span id="sec-ethics" class="quarto-section-identifier"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">AI and Data Ethics</span></span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="sidebar-acknowledgement-dr.-rachel-thomas" class="level3">
+<h3 class="anchored" data-anchor-id="sidebar-acknowledgement-dr.-rachel-thomas">Sidebar: Acknowledgement: Dr.&nbsp;Rachel Thomas</h3>
+<p>This chapter was co-authored by Dr.&nbsp;Rachel Thomas, the cofounder of fast.ai, and founding director of the Center for Applied Data Ethics at the University of San Francisco. It largely follows a subset of the syllabus she developed for the <a href="https://ethics.fast.ai">Introduction to Data Ethics</a> course.</p>
+</section>
+<section id="end-sidebar" class="level3">
+<h3 class="anchored" data-anchor-id="end-sidebar">End sidebar</h3>
+<p>As we discussed in Chapters 1 and 2, sometimes machine learning models can go wrong. They can have bugs. They can be presented with data that they haven’t seen before, and behave in ways we don’t expect. Or they could work exactly as designed, but be used for something that we would much prefer they were never, ever used for.</p>
+<p>Because deep learning is such a powerful tool and can be used for so many things, it becomes particularly important that we consider the consequences of our choices. The philosophical study of <em>ethics</em> is the study of right and wrong, including how we can define those terms, recognize right and wrong actions, and understand the connection between actions and consequences. The field of <em>data ethics</em> has been around for a long time, and there are many academics focused on this field. It is being used to help define policy in many jurisdictions; it is being used in companies big and small to consider how best to ensure good societal outcomes from product development; and it is being used by researchers who want to make sure that the work they are doing is used for good, and not for bad.</p>
+<p>As a deep learning practitioner, therefore, it is likely that at some point you are going to be put in a situation where you need to consider data ethics. So what is data ethics? It’s a subfield of ethics, so let’s start there.</p>
+<blockquote class="blockquote">
+<p>J: At university, philosophy of ethics was my main thing (it would have been the topic of my thesis, if I’d finished it, instead of dropping out to join the real world). Based on the years I spent studying ethics, I can tell you this: no one really agrees on what right and wrong are, whether they exist, how to spot them, which people are good, and which bad, or pretty much anything else. So don’t expect too much from the theory! We’re going to focus on examples and thought starters here, not theory.</p>
+</blockquote>
+<p>In answering the question <a href="https://www.scu.edu/ethics/ethics-resources/ethical-decision-making/what-is-ethics/">“What Is Ethics”</a>, The Markkula Center for Applied Ethics says that the term refers to:</p>
+<ul>
+<li>Well-founded standards of right and wrong that prescribe what humans ought to do</li>
+<li>The study and development of one’s ethical standards.</li>
+</ul>
+<p>There is no list of right answers. There is no list of do and don’t. Ethics is complicated, and context-dependent. It involves the perspectives of many stakeholders. Ethics is a muscle that you have to develop and practice. In this chapter, our goal is to provide some signposts to help you on that journey.</p>
+<p>Spotting ethical issues is best to do as part of a collaborative team. This is the only way you can really incorporate different perspectives. Different people’s backgrounds will help them to see things which may not be obvious to you. Working with a team is helpful for many “muscle-building” activities, including this one.</p>
+<p>This chapter is certainly not the only part of the book where we talk about data ethics, but it’s good to have a place where we focus on it for a while. To get oriented, it’s perhaps easiest to look at a few examples. So, we picked out three that we think illustrate effectively some of the key topics.</p>
+</section>
+<section id="key-examples-for-data-ethics" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="key-examples-for-data-ethics"><span class="header-section-number">3.1</span> Key Examples for Data Ethics</h2>
+<p>We are going to start with three specific examples that illustrate three common ethical issues in tech:</p>
+<ol type="1">
+<li><em>Recourse processes</em>—Arkansas’s buggy healthcare algorithms left patients stranded.</li>
+<li><em>Feedback loops</em>—YouTube’s recommendation system helped unleash a conspiracy theory boom.</li>
+<li><em>Bias</em>—When a traditionally African-American name is searched for on Google, it displays ads for criminal background checks.</li>
+</ol>
+<p>In fact, for every concept that we introduce in this chapter, we are going to provide at least one specific example. For each one, think about what you could have done in this situation, and what kinds of obstructions there might have been to you getting that done. How would you deal with them? What would you look out for?</p>
+<section id="bugs-and-recourse-buggy-algorithm-used-for-healthcare-benefits" class="level3">
+<h3 class="anchored" data-anchor-id="bugs-and-recourse-buggy-algorithm-used-for-healthcare-benefits">Bugs and Recourse: Buggy Algorithm Used for Healthcare Benefits</h3>
+<p>The Verge&nbsp;investigated software&nbsp;used in over half of the US states to determine how much healthcare people receive, and documented their findings in the article <a href="https://www.theverge.com/2018/3/21/17144260/healthcare-medicaid-algorithm-arkansas-cerebral-palsy">“What Happens When an Algorithm Cuts Your Healthcare”</a>. After implementation of the algorithm in Arkansas, hundreds of people (many with severe disabilities) had their healthcare drastically cut. For instance, Tammy Dobbs, a woman with cerebral palsy who needs an aid to help her to get out of bed, to go to the bathroom, to get food, and more, had her hours of help suddenly reduced by 20 hours a week.&nbsp;She couldn’t get any explanation for why her healthcare was cut.&nbsp;Eventually, a court case revealed that there were mistakes in the software implementation of the algorithm, negatively impacting people with diabetes or cerebral palsy. However, Dobbs and many other people reliant on these healthcare benefits live in fear that their benefits could again be cut suddenly and inexplicably.</p>
+</section>
+<section id="feedback-loops-youtubes-recommendation-system" class="level3">
+<h3 class="anchored" data-anchor-id="feedback-loops-youtubes-recommendation-system">Feedback Loops: YouTube’s Recommendation System</h3>
+<p>Feedback loops can occur when your model is controlling the next round of data you get. The data that is returned quickly becomes flawed by the software itself.</p>
+<p>For instance, YouTube has 1.9 billion users, who watch over 1 billion hours of YouTube videos a day. Its recommendation algorithm (built by Google), which was designed to optimize watch time, is responsible for around 70% of the content that is watched. But there was a problem: it led to out-of-control feedback loops, leading the <em>New York Times</em> to run the headline <a href="https://www.nytimes.com/2019/02/19/technology/youtube-conspiracy-stars.html">“YouTube Unleashed a Conspiracy Theory Boom. Can It Be Contained?”</a>. Ostensibly recommendation systems are predicting what content people will like, but they also have a lot of power in determining what content people even see.</p>
+</section>
+<section id="bias-professor-latanya-sweeney-arrested" class="level3">
+<h3 class="anchored" data-anchor-id="bias-professor-latanya-sweeney-arrested">Bias: Professor Latanya Sweeney “Arrested”</h3>
+<p>Dr.&nbsp;Latanya Sweeney is a professor at Harvard and director of the university’s data privacy lab. In the paper <a href="https://arxiv.org/abs/1301.6822">“Discrimination in Online Ad Delivery”</a> (see &lt;<latanya_arrested>&gt;) she describes her discovery that Googling her name resulted in advertisements saying “Latanya Sweeney, arrested?” even though she is the only known Latanya Sweeney and has never been arrested. However when she Googled other names, such as “Kirsten Lindquist,” she got more neutral ads, even though Kirsten Lindquist has been arrested three times.</latanya_arrested></p>
+<p><img src="images/ethics/image1.png" id="latanya_arrested" caption="Google search showing ads about Professor Latanya Sweeney's arrest record" alt="Screenshot of google search showing ads about Professor Latanya Sweeney's arrest record" width="400"></p>
+<p>Being a computer scientist, she studied this systematically, and looked at over 2000 names. She found a clear pattern where historically Black names received advertisements suggesting that the person had a criminal record, whereas, white names had more neutral advertisements.</p>
+<p>This is an example of bias. It can make a big difference to people’s lives—for instance, if a job applicant is Googled it may appear that they have a criminal record when they do not.</p>
+</section>
+<section id="why-does-this-matter" class="level3">
+<h3 class="anchored" data-anchor-id="why-does-this-matter">Why Does This Matter?</h3>
+<p>One very natural reaction to considering these issues is: “So what? What’s that got to do with me? I’m a data scientist, not a politician. I’m not one of the senior executives at my company who make the decisions about what we do. I’m just trying to build the most predictive model I can.”</p>
+<p>These are very reasonable questions. But we’re going to try to convince you that the answer is that everybody who is training models absolutely needs to consider how their models will be used, and consider how to best ensure that they are used as positively as possible. There are things you can do. And if you don’t do them, then things can go pretty badly.</p>
+<p>One particularly hideous example of what happens when technologists focus on technology at all costs is the story of IBM and Nazi Germany. In 2001, a Swiss judge ruled that it was not unreasonable “to deduce that IBM’s technical assistance facilitated the tasks of the Nazis in the commission of their crimes against humanity, acts also involving accountancy and classification by IBM machines and utilized in the concentration camps themselves.”</p>
+<p>IBM, you see, supplied the Nazis with data tabulation products necessary to track the extermination of Jews and other groups on a massive scale. This was driven from the top of the company, with marketing to Hitler and his leadership team. Company President Thomas Watson personally approved the 1939 release of special IBM alphabetizing machines to help organize the deportation of Polish Jews. Pictured in &lt;<meeting>&gt; is Adolf Hitler (far left) meeting with IBM CEO Tom Watson Sr.&nbsp;(second from left), shortly before Hitler awarded Watson a special “Service to the Reich” medal in 1937.</meeting></p>
+<p><img src="images/ethics/image2.png" id="meeting" caption="IBM CEO Tom Watson Sr. meeting with Adolf Hitler" alt="A picture of IBM CEO Tom Watson Sr. meeting with Adolf Hitler" width="400"></p>
+<p>But this was not an isolated incident—the organization’s involvement was extensive. IBM and its subsidiaries provided regular training and maintenance onsite at the concentration camps: printing off cards, configuring machines, and repairing them as they broke frequently. IBM set up categorizations on its punch card system for the way that each person was killed, which group they were assigned to, and the logistical information necessary to track them through the vast Holocaust system. IBM’s code for Jews in the concentration camps was 8: some 6,000,000 were killed. Its code for Romanis was 12 (they were labeled by the Nazis as “asocials,” with over 300,000 killed in the <em>Zigeunerlager</em>, or “Gypsy camp”). General executions were coded as 4, death in the gas chambers as 6.</p>
+<p><img src="images/ethics/image3.jpeg" id="punch_card" caption="A punch card used by IBM in concentration camps" alt="Picture of a punch card used by IBM in concentration camps" width="600"></p>
+<p>Of course, the project managers and engineers and technicians involved were just living their ordinary lives. Caring for their families, going to the church on Sunday, doing their jobs the best they could. Following orders. The marketers were just doing what they could to meet their business development goals. As Edwin Black, author of <em>IBM and the Holocaust</em> (Dialog Press) observed: “To the blind technocrat, the means were more important than the ends. The destruction of the Jewish people became even less important because the invigorating nature of IBM’s technical achievement was only heightened by the fantastical profits to be made at a time when bread lines stretched across the world.”</p>
+<p>Step back for a moment and consider: How would you feel if you discovered that you had been part of a system that ended up hurting society? Would you be open to finding out? How can you help make sure this doesn’t happen? We have described the most extreme situation here, but there are many negative societal consequences linked to AI and machine learning being observed today, some of which we’ll describe in this chapter.</p>
+<p>It’s not just a moral burden, either. Sometimes technologists pay very directly for their actions. For instance, the first person who was jailed as a result of the Volkswagen scandal, where the car company was revealed to have cheated on its diesel emissions tests, was not the manager that oversaw the project, or an executive at the helm of the company. It was one of the engineers, James Liang, who just did what he was told.</p>
+<p>Of course, it’s not all bad—if a project you are involved in turns out to make a huge positive impact on even one person, this is going to make you feel pretty great!</p>
+<p>Okay, so hopefully we have convinced you that you ought to care. But what should you do? As data scientists, we’re naturally inclined to focus on making our models better by optimizing some metric or other. But optimizing that metric may not actually lead to better outcomes. And even if it <em>does</em> help create better outcomes, it almost certainly won’t be the only thing that matters. Consider the pipeline of steps that occurs between the development of a model or an algorithm by a researcher or practitioner, and the point at which this work is actually used to make some decision. This entire pipeline needs to be considered <em>as a whole</em> if we’re to have a hope of getting the kinds of outcomes we want.</p>
+<p>Normally there is a very long chain from one end to the other. This is especially true if you are a researcher, where you might not even know if your research will ever get used for anything, or if you’re involved in data collection, which is even earlier in the pipeline. But no one is better placed to inform everyone involved in this chain about the capabilities, constraints, and details of your work than you are. Although there’s no “silver bullet” that can ensure your work is used the right way, by getting involved in the process, and asking the right questions, you can at the very least ensure that the right issues are being considered.</p>
+<p>Sometimes, the right response to being asked to do a piece of work is to just say “no.” Often, however, the response we hear is, “If I don’t do it, someone else will.” But consider this: if you’ve been picked for the job, you’re the best person they’ve found to do it—so if you don’t do it, the best person isn’t working on that project. If the first five people they ask all say no too, even better!</p>
+</section>
+</section>
+<section id="integrating-machine-learning-with-product-design" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="integrating-machine-learning-with-product-design"><span class="header-section-number">3.2</span> Integrating Machine Learning with Product Design</h2>
+<p>Presumably the reason you’re doing this work is because you hope it will be used for something. Otherwise, you’re just wasting your time. So, let’s start with the assumption that your work will end up somewhere. Now, as you are collecting your data and developing your model, you are making lots of decisions. What level of aggregation will you store your data at? What loss function should you use? What validation and training sets should you use? Should you focus on simplicity of implementation, speed of inference, or accuracy of the model? How will your model handle out-of-domain data items? Can it be fine-tuned, or must it be retrained from scratch over time?</p>
+<p>These are not just algorithm questions. They are data product design questions. But the product managers, executives, judges, journalists, doctors… whoever ends up developing and using the system of which your model is a part will not be well-placed to understand the decisions that you made, let alone change them.</p>
+<p>For instance, two studies found that Amazon’s facial recognition software produced <a href="https://www.nytimes.com/2018/07/26/technology/amazon-aclu-facial-recognition-congress.html">inaccurate</a> and <a href="https://www.theverge.com/2019/1/25/18197137/amazon-rekognition-facial-recognition-bias-race-gender">racially biased</a> results. Amazon claimed that the researchers should have changed the default parameters, without explaining how this would have changed the biased results. Furthermore, it turned out that&nbsp;<a href="https://gizmodo.com/defense-of-amazons-face-recognition-tool-undermined-by-1832238149">Amazon was not instructing police departments</a>&nbsp;that used its software to do this either. There was, presumably, a big distance between the researchers that developed these algorithms and the Amazon documentation staff that wrote the guidelines provided to the police. A lack of tight integration led to serious problems for society at large, the police, and Amazon themselves. It turned out that their system erroneously matched 28 members of congress to criminal mugshots! (And the Congresspeople wrongly matched to criminal mugshots were disproportionately people of color, as seen in &lt;<congressmen>&gt;.)</congressmen></p>
+<p><img src="images/ethics/image4.png" id="congressmen" caption="Congresspeople matched to criminal mugshots by Amazon software" alt="Picture of the congresspeople matched to criminal mugshots by Amazon software, they are disproportionately people of color" width="500"></p>
+<p>Data scientists need to be part of a cross-disciplinary team. And researchers need to work closely with the kinds of people who will end up using their research. Better still is if the domain experts themselves have learned enough to be able to train and debug some models themselves—hopefully there are a few of you reading this book right now!</p>
+<p>The modern workplace is a very specialized place. Everybody tends to have well-defined jobs to perform. Especially in large companies, it can be hard to know what all the pieces of the puzzle are. Sometimes companies even intentionally obscure the overall project goals that are being worked on, if they know that their employees are not going to like the answers. This is sometimes done by compartmentalising pieces as much as possible.</p>
+<p>In other words, we’re not saying that any of this is easy. It’s hard. It’s really hard. We all have to do our best. And we have often seen that the people who do get involved in the higher-level context of these projects, and attempt to develop cross-disciplinary capabilities and teams, become some of the most important and well rewarded members of their organizations. It’s the kind of work that tends to be highly appreciated by senior executives, even if it is sometimes considered rather uncomfortable by middle management.</p>
+</section>
+<section id="topics-in-data-ethics" class="level2" data-number="3.3">
+<h2 data-number="3.3" class="anchored" data-anchor-id="topics-in-data-ethics"><span class="header-section-number">3.3</span> Topics in Data Ethics</h2>
+<p>Data ethics is a big field, and we can’t cover everything. Instead, we’re going to pick a few topics that we think are particularly relevant:</p>
+<ul>
+<li>The need for recourse and accountability</li>
+<li>Feedback loops</li>
+<li>Bias</li>
+<li>Disinformation</li>
+</ul>
+<p>Let’s look at each in turn.</p>
+<section id="recourse-and-accountability" class="level3">
+<h3 class="anchored" data-anchor-id="recourse-and-accountability">Recourse and Accountability</h3>
+<p>In a complex system, it is easy for no one person to feel responsible for outcomes. While this is understandable, it does not lead to good results. In the earlier example of the Arkansas healthcare system in which a bug led to people with cerebral palsy losing access to needed care, the creator of the algorithm blamed government officials, and government officials blamed those who implemented the software. NYU professor <a href="https://www.youtube.com/watch?v=NTl0yyPqf3E">Danah Boyd</a> described this phenomenon: “Bureaucracy has often been used to shift or evade responsibility… Today’s algorithmic systems are extending bureaucracy.”</p>
+<p>An additional reason why recourse is so necessary is because data often contains errors. Mechanisms for audits and error correction are crucial. A database of suspected gang members maintained by California law enforcement officials was found to be full of errors, including 42 babies who had been added to the database when they were less than 1 year old (28 of whom were marked as “admitting to being gang members”). In this case, there was no process in place for correcting mistakes or removing people once they’d been added. Another example is the US credit report system: in a large-scale study of credit reports by the Federal Trade Commission (FTC) in 2012, it was found that 26% of consumers had at least one mistake in their files, and 5% had errors that could be devastating. Yet, the process of getting such errors corrected is incredibly slow and opaque. When public radio reporter <a href="https://www.washingtonpost.com/posteverything/wp/2016/09/08/how-the-careless-errors-of-credit-reporting-agencies-are-ruining-peoples-lives/">Bobby Allyn</a> discovered that he was erroneously listed as having a firearms conviction, it took him “more than a dozen phone calls, the handiwork of a county court clerk and six weeks to solve the problem. And that was only after I contacted the company’s communications department as a journalist.”</p>
+<p>As machine learning practitioners, we do not always think of it as our responsibility to understand how our algorithms end up being implemented in practice. But we need to.</p>
+</section>
+<section id="feedback-loops" class="level3">
+<h3 class="anchored" data-anchor-id="feedback-loops">Feedback Loops</h3>
+<p>We explained in &lt;<chapter_intro>&gt; how an algorithm can interact with its environment to create a feedback loop, making predictions that reinforce actions taken in the real world, which lead to predictions even more pronounced in the same direction. As an example, let’s again consider YouTube’s recommendation system. A couple of years ago the Google team talked about how they had introduced reinforcement learning (closely related to deep learning, but where your loss function represents a result potentially a long time after an action occurs) to improve YouTube’s recommendation system. They described how they used an algorithm that made recommendations such that watch time would be optimized.</chapter_intro></p>
+<p>However, human beings tend to be drawn to controversial content. This meant that videos about things like conspiracy theories started to get recommended more and more by the recommendation system. Furthermore, it turns out that the kinds of people that are interested in conspiracy theories are also people that watch a lot of online videos! So, they started to get drawn more and more toward YouTube. The increasing number of conspiracy theorists watching videos on YouTube resulted in the algorithm recommending more and more conspiracy theory and other extremist content, which resulted in more extremists watching videos on YouTube, and more people watching YouTube developing extremist views, which led to the algorithm recommending more extremist content… The system was spiraling out of control.</p>
+<p>And this phenomenon was not contained to this particular type of content. In June 2019 the <em>New York Times</em> published an article on YouTube’s recommendation system, titled <a href="https://www.nytimes.com/2019/06/03/world/americas/youtube-pedophiles.html">“On YouTube’s Digital Playground, an Open Gate for Pedophiles”</a>. The article started with this chilling story:</p>
+<blockquote class="blockquote">
+<p>: Christiane C. didn’t think anything of it when her 10-year-old daughter and a friend uploaded a video of themselves playing in a backyard pool… A few days later… the video had thousands of views. Before long, it had ticked up to 400,000… “I saw the video again and I got scared by the number of views,” Christiane said. She had reason to be. YouTube’s automated recommendation system… had begun showing the video to users who watched other videos of prepubescent, partially clothed children, a team of researchers has found.</p>
+</blockquote>
+<blockquote class="blockquote">
+<p>: On its own, each video might be perfectly innocent, a home movie, say, made by a child. Any revealing frames are fleeting and appear accidental. But, grouped together, their shared features become unmistakable.</p>
+</blockquote>
+<p>YouTube’s recommendation algorithm had begun curating playlists for pedophiles, picking out innocent home videos that happened to contain prepubescent, partially clothed children.</p>
+<p>No one at Google planned to create a system that turned family videos into porn for pedophiles. So what happened?</p>
+<p>Part of the problem here is the centrality of metrics in driving a financially important system. When an algorithm has a metric to optimize, as you have seen, it will do everything it can to optimize that number. This tends to lead to all kinds of edge cases, and humans interacting with a system will search for, find, and exploit these edge cases and feedback loops for their advantage.</p>
+<p>There are signs that this is exactly what has happened with YouTube’s recommendation system. <em>The Guardian</em> ran an article called <a href="https://www.theguardian.com/technology/2018/feb/02/youtube-algorithm-election-clinton-trump-guillaume-chaslot">“How an ex-YouTube Insider Investigated its Secret Algorithm”</a> about Guillaume Chaslot, an ex-YouTube engineer who created AlgoTransparency, which tracks these issues. Chaslot published the chart in &lt;<ethics_yt_rt>&gt;, following the release of Robert Mueller’s “Report on the Investigation Into Russian Interference in the 2016 Presidential Election.”</ethics_yt_rt></p>
+<p><img src="images/ethics/image18.jpeg" id="ethics_yt_rt" caption="Coverage of the Mueller report" alt="Coverage of the Mueller report" width="500"></p>
+<p>Russia Today’s coverage of the Mueller report was an extreme outlier in terms of how many channels were recommending it. This suggests the possibility that Russia Today, a state-owned Russia media outlet, has been successful in gaming YouTube’s recommendation algorithm. Unfortunately, the lack of transparency of systems like this makes it hard to uncover the kinds of problems that we’re discussing.</p>
+<p>One of our reviewers for this book, Aurélien Géron, led YouTube’s video classification team from 2013 to 2016 (well before the events discussed here). He pointed out that it’s not just feedback loops involving humans that are a problem. There can also be feedback loops without humans! He told us about an example from YouTube:</p>
+<blockquote class="blockquote">
+<p>: One important signal to classify the main topic of a video is the channel it comes from. For example, a video uploaded to a cooking channel is very likely to be a cooking video. But how do we know what topic a channel is about? Well… in part by looking at the topics of the videos it contains! Do you see the loop? For example, many videos have a description which indicates what camera was used to shoot the video. As a result, some of these videos might get classified as videos about “photography.” If a channel has such a misclassified video, it might be classified as a “photography” channel, making it even more likely for future videos on this channel to be wrongly classified as “photography.” This could even lead to runaway virus-like classifications! One way to break this feedback loop is to classify videos with and without the channel signal. Then when classifying the channels, you can only use the classes obtained without the channel signal. This way, the feedback loop is broken.</p>
+</blockquote>
+<p>There are positive examples of people and organizations attempting to combat these problems. Evan Estola, lead machine learning engineer at Meetup,&nbsp;<a href="https://www.youtube.com/watch?v=MqoRzNhrTnQ">discussed the example</a>&nbsp;of men expressing more interest than women in tech meetups. taking gender into account could therefore cause Meetup’s algorithm to recommend fewer tech meetups to women, and as a result, fewer women would find out about and attend tech meetups, which could cause the algorithm to suggest even fewer tech meetups to women, and so on in a self-reinforcing feedback loop. So, Evan and his team made the ethical decision for their recommendation algorithm to not create such a feedback loop, by explicitly not using gender for that part of their model. It is encouraging to see a company not just unthinkingly optimize a metric, but consider its impact. According to Evan, “You need to decide which feature not to use in your algorithm… the most optimal algorithm is perhaps not the best one to launch into production.”</p>
+<p>While Meetup chose to avoid such an outcome, Facebook provides an example of allowing a runaway feedback loop to run wild. Like YouTube, it tends to radicalize users interested in one conspiracy theory by introducing them to more. As&nbsp;Renee DiResta, a researcher on proliferation of disinformation, <a href="https://www.fastcompany.com/3059742/social-network-algorithms-are-distorting-reality-by-boosting-conspiracy-theories">writes</a>:</p>
+<blockquote class="blockquote">
+<p>: Once people join a single conspiracy-minded [Facebook] group, they are algorithmically routed to a plethora of others. Join an anti-vaccine group, and your suggestions will include anti-GMO, chemtrail watch, flat Earther (yes, really), and “curing cancer naturally groups. Rather than pulling a user out of the rabbit hole, the recommendation engine pushes them further in.”</p>
+</blockquote>
+<p>It is extremely important to keep in mind that this kind of behavior can happen, and to either anticipate a feedback loop or take positive action to break it when you see the first signs of it in your own projects. Another thing to keep in mind is <em>bias</em>, which, as we discussed briefly in the previous chapter, can interact with feedback loops in very troublesome ways.</p>
+</section>
+<section id="bias" class="level3">
+<h3 class="anchored" data-anchor-id="bias">Bias</h3>
+<p>Discussions of bias online tend to get pretty confusing pretty fast. The word “bias” means so many different things. Statisticians often think when data ethicists are talking about bias that they’re talking about the statistical definition of the term bias. But they’re not. And they’re certainly not talking about the biases that appear in the weights and biases which are the parameters of your model!</p>
+<p>What they’re talking about is the social science concept of bias. In <a href="https://arxiv.org/abs/1901.10002">“A Framework for Understanding Unintended Consequences of Machine Learning”</a> MIT’s Harini Suresh and John Guttag describe six types of bias in machine learning, summarized in &lt;<bias>&gt; from their paper.</bias></p>
+<p><img src="images/ethics/pipeline_diagram.svg" id="bias" caption="Bias in machine learning can come from multiple sources (courtesy of Harini Suresh and John V. Guttag)" alt="A diagram showing all sources where bias can appear in machine learning" width="700"></p>
+<p>We’ll discuss four of these types of bias, those that we’ve found most helpful in our own work (see the paper for details on the others).</p>
+<section id="historical-bias" class="level4">
+<h4 class="anchored" data-anchor-id="historical-bias">Historical bias</h4>
+<p><em>Historical bias</em> comes from the fact that people are biased, processes are biased, and society is biased. Suresh and Guttag say: “Historical bias is a fundamental, structural issue with the first step of the data generation process and can exist even given perfect sampling and feature selection.”</p>
+<p>For instance, here are a few examples of historical <em>race bias</em> in the US, from the <em>New York Times</em> article <a href="https://www.nytimes.com/2015/01/04/upshot/the-measuring-sticks-of-racial-bias-.html">“Racial Bias, Even When We Have Good Intentions”</a> by the University of Chicago’s Sendhil Mullainathan:</p>
+<ul>
+<li>When doctors were shown identical files, they were much less likely to recommend cardiac catheterization (a helpful procedure) to Black patients.</li>
+<li>When bargaining for a used car, Black people were offered initial prices $700 higher and received far smaller concessions.</li>
+<li>Responding to apartment rental ads on Craigslist with a Black name elicited fewer responses than with a white name.</li>
+<li>An all-white jury was 16 percentage points more likely to convict a Black defendant than a white one, but when a jury had one Black member it convicted both at the same rate.</li>
+</ul>
+<p>The COMPAS algorithm, widely used for sentencing and bail decisions in the US, is an example of an important algorithm that, when tested by <a href="https://www.propublica.org/article/machine-bias-risk-assessments-in-criminal-sentencing">ProPublica</a>, showed clear racial bias in practice (&lt;<bail_algorithm>&gt;).</bail_algorithm></p>
+<p><img src="images/ethics/image6.png" id="bail_algorithm" caption="Results of the COMPAS algorithm" alt="Table showing the COMPAS algorithm is more likely to give bail to white people, even if they re-offend more" width="700"></p>
+<p>Any dataset involving humans can have this kind of bias: medical data, sales data, housing data, political data, and so on. Because underlying bias is so pervasive, bias in datasets is very pervasive. Racial bias even turns up in computer vision, as shown in the example of autocategorized photos shared on Twitter by a Google Photos user shown in &lt;<google_photos>&gt;.</google_photos></p>
+<p><img src="images/ethics/image7.png" id="google_photos" caption="One of these labels is very wrong..." alt="Screenshot of the use of Google photos labeling a black user and her friend as gorillas" width="450"></p>
+<p>Yes, that is showing what you think it is: Google Photos classified a Black user’s photo with their friend as “gorillas”! This algorithmic misstep got a lot of attention in the media. “We’re appalled and genuinely sorry that this happened,” a company spokeswoman said. “There is still clearly a lot of work to do with automatic image labeling, and we’re looking at how we can prevent these types of mistakes from happening in the future.”</p>
+<p>Unfortunately, fixing problems in machine learning systems when the input data has problems is hard. Google’s first attempt didn’t inspire confidence, as coverage by <em>The Guardian</em> suggested (&lt;<gorilla-ban>&gt;).</gorilla-ban></p>
+<p><img src="images/ethics/image8.png" id="gorilla-ban" caption="Google's first response to the problem" alt="Pictures of a headlines from the Guardian, showing Google removed gorillas and other moneys from the possible labels of its algorithm" width="500"></p>
+<p>These kinds of problems are certainly not limited to just Google. MIT researchers studied the most popular online computer vision APIs to see how accurate they were. But they didn’t just calculate a single accuracy number—instead, they looked at the accuracy across four different groups, as illustrated in &lt;<face_recognition>&gt;.</face_recognition></p>
+<p><img src="images/ethics/image9.jpeg" id="face_recognition" caption="Error rate per gender and race for various facial recognition systems" alt="Table showing how various facial recognition systems perform way worse on darker shades of skin and females" width="600"></p>
+<p>IBM’s system, for instance, had a 34.7% error rate for darker females, versus 0.3% for lighter males—over 100 times more errors! Some people incorrectly reacted to these experiments by claiming that the difference was simply because darker skin is harder for computers to recognize. However, what actually happened was that, after the negative publicity that this result created, all of the companies in question dramatically improved their models for darker skin, such that one year later they were nearly as good as for lighter skin. So what this actually showed is that the developers failed to utilize datasets containing enough darker faces, or test their product with darker faces.</p>
+<p>One of the MIT researchers, Joy Buolamwini, warned: “We have entered the age of automation overconfident yet underprepared. If we fail to make ethical and inclusive artificial intelligence, we risk losing gains made in civil rights and gender equity under the guise of machine neutrality.”</p>
+<p>Part of the issue appears to be a systematic imbalance in the makeup of popular datasets used for training models. The abstract to the paper <a href="https://arxiv.org/abs/1711.08536">“No Classification Without Representation: Assessing Geodiversity Issues in Open Data Sets for the Developing World”</a> by Shreya Shankar et al.&nbsp;states, “We analyze two large, publicly available image data sets to assess geo-diversity and find that these data sets appear to exhibit an observable amerocentric and eurocentric representation bias. Further, we analyze classifiers trained on these data sets to assess the impact of these training distributions and find strong differences in the relative performance on images from different locales.” &lt;<image_provenance>&gt; shows one of the charts from the paper, showing the geographic makeup of what was, at the time (and still are, as this book is being written) the two most important image datasets for training models.</image_provenance></p>
+<p><img src="images/ethics/image10.png" id="image_provenance" caption="Image provenance in popular training sets" alt="Graphs showing how the vast majority of images in popular training datasets come from the US or Western Europe" width="800"></p>
+<p>The vast majority of the images are from the United States and other Western countries, leading to models trained on ImageNet performing worse on scenes from other countries and cultures. For instance, research found that such models are worse at identifying household items (such as soap, spices, sofas, or beds) from lower-income countries. &lt;<object_detect>&gt; shows an image from the paper, <a href="https://arxiv.org/pdf/1906.02659.pdf">“Does Object Recognition Work for Everyone?”</a> by Terrance DeVries et al.&nbsp;of Facebook AI Research that illustrates this point.</object_detect></p>
+<p><img src="images/ethics/image17.png" id="object_detect" caption="Object detection in action" alt="Figure showing an object detection algorithm performing better on western products" width="500"></p>
+<p>In this example, we can see that the lower-income soap example is a very long way away from being accurate, with every commercial image recognition service predicting “food” as the most likely answer!</p>
+<p>As we will discuss shortly, in addition, the vast majority of AI researchers and developers are young white men. Most projects that we have seen do most user testing using friends and families of the immediate product development group. Given this, the kinds of problems we just discussed should not be surprising.</p>
+<p>Similar historical bias is found in the texts used as data for natural language processing models. This crops up in downstream machine learning tasks in many ways. For instance, it <a href="https://nypost.com/2017/11/30/google-translates-algorithm-has-a-gender-bias/">was widely reported</a> that until last year Google Translate showed systematic bias in how it translated the Turkish gender-neutral pronoun “o” into English: when applied to jobs which are often associated with males it used “he,” and when applied to jobs which are often associated with females it used “she” (&lt;<turkish_gender>&gt;).</turkish_gender></p>
+<p><img src="images/ethics/image11.png" id="turkish_gender" caption="Gender bias in text data sets" alt="Figure showing gender bias in data sets used to train language models showing up in translations" width="600"></p>
+<p>We also see this kind of bias in online advertisements. For instance, a <a href="https://arxiv.org/abs/1904.02095">study</a> in 2019 by Muhammad Ali et al.&nbsp;found that even when the person placing the ad does not intentionally discriminate, Facebook will show ads to very different audiences based on race and gender. Housing ads with the same text, but picture either a white or a Black family, were shown to racially different audiences.</p>
+</section>
+<section id="measurement-bias" class="level4">
+<h4 class="anchored" data-anchor-id="measurement-bias">Measurement bias</h4>
+<p>In the paper <a href="https://scholar.harvard.edu/files/sendhil/files/aer.p20171084.pdf">“Does Machine Learning Automate Moral Hazard and Error”</a> in <em>American Economic Review</em>, Sendhil Mullainathan and Ziad Obermeyer look at a model that tries to answer the question: using historical electronic health record (EHR) data, what factors are most predictive of stroke? These are the top predictors from the model:</p>
+<ul>
+<li>Prior stroke</li>
+<li>Cardiovascular disease</li>
+<li>Accidental injury</li>
+<li>Benign breast lump</li>
+<li>Colonoscopy</li>
+<li>Sinusitis</li>
+</ul>
+<p>However, only the top two have anything to do with a stroke! Based on what we’ve studied so far, you can probably guess why. We haven’t really measured <em>stroke</em>, which occurs when a region of the brain is denied oxygen due to an interruption in the blood supply. What we’ve measured is who had symptoms, went to a doctor, got the appropriate tests, <em>and</em> received a diagnosis of stroke. Actually having a stroke is not the only thing correlated with this complete list—it’s also correlated with being the kind of person who actually goes to the doctor (which is influenced by who has access to healthcare, can afford their co-pay, doesn’t experience racial or gender-based medical discrimination, and more)! If you are likely to go to the doctor for an <em>accidental injury</em>, then you are likely to also go the doctor when you are having a stroke.</p>
+<p>This is an example of <em>measurement bias</em>. It occurs when our models make mistakes because we are measuring the wrong thing, or measuring it in the wrong way, or incorporating that measurement into the model inappropriately.</p>
+</section>
+<section id="aggregation-bias" class="level4">
+<h4 class="anchored" data-anchor-id="aggregation-bias">Aggregation bias</h4>
+<p><em>Aggregation bias</em> occurs when models do not aggregate data in a way that incorporates all of the appropriate factors, or when a model does not include the necessary interaction terms, nonlinearities, or so forth. This can particularly occur in medical settings. For instance, the way diabetes is treated is often based on simple univariate statistics and studies involving small groups of heterogeneous people. Analysis of results is often done in a way that does not take account of different ethnicities or genders. However, it turns out that diabetes patients have <a href="https://www.ncbi.nlm.nih.gov/pubmed/24037313">different complications across ethnicities</a>, and HbA1c levels (widely used to diagnose and monitor diabetes) <a href="https://www.ncbi.nlm.nih.gov/pubmed/22238408">differ in complex ways across ethnicities and genders</a>. This can result in people being misdiagnosed or incorrectly treated because medical decisions are based on a model that does not include these important variables and interactions.</p>
+</section>
+<section id="representation-bias" class="level4">
+<h4 class="anchored" data-anchor-id="representation-bias">Representation bias</h4>
+<p>The abstract of the paper <a href="https://arxiv.org/abs/1901.09451">“Bias in Bios: A Case Study of Semantic Representation Bias in a High-Stakes Setting”</a> by Maria De-Arteaga et al.&nbsp;notes that there is gender imbalance in occupations (e.g., females are more likely to be nurses, and males are more likely to be pastors), and says that: “differences in true positive rates between genders are correlated with existing gender imbalances in occupations, which may compound these imbalances.”</p>
+<p>In other words, the researchers noticed that models predicting occupation did not only <em>reflect</em> the actual gender imbalance in the underlying population, but actually <em>amplified</em> it! This type of <em>representation bias</em> is quite common, particularly for simple models. When there is some clear, easy-to-see underlying relationship, a simple model will often simply assume that this relationship holds all the time. As &lt;<representation_bias>&gt; from the paper shows, for occupations that had a higher percentage of females, the model tended to overestimate the prevalence of that occupation.</representation_bias></p>
+<p><img src="images/ethics/image12.png" id="representation_bias" caption="Model error in predicting occupation plotted against percentage of women in said occupation" alt="Graph showing how model predictions overamplify existing bias" width="500"></p>
+<p>For example, in the training dataset 14.6% of surgeons were women, yet in the model predictions only 11.6% of the true positives were women. The model is thus amplifying the bias existing in the training set.</p>
+<p>Now that we’ve seen that those biases exist, what can we do to mitigate them?</p>
+</section>
+</section>
+<section id="addressing-different-types-of-bias" class="level3">
+<h3 class="anchored" data-anchor-id="addressing-different-types-of-bias">Addressing different types of bias</h3>
+<p>Different types of bias require different approaches for mitigation. While gathering a more diverse dataset can address representation bias, this would not help with historical bias or measurement bias. All datasets contain bias. There is no such thing as a completely debiased dataset. Many researchers in the field have been converging on a set of proposals to enable better documentation of the decisions, context, and specifics about how and why a particular dataset was created, what scenarios it is appropriate to use in, and what the limitations are. This way, those using a particular dataset will not be caught off guard by its biases and limitations.</p>
+<p>We often hear the question—“Humans are biased, so does algorithmic bias even matter?” This comes up so often, there must be some reasoning that makes sense to the people that ask it, but it doesn’t seem very logically sound to us! Independently of whether this is logically sound, it’s important to realize that algorithms (particularly machine learning algorithms!) and people are different. Consider these points about machine learning algorithms:</p>
+<ul>
+<li><em>Machine learning can create feedback loops</em>:: Small amounts of bias can rapidly increase exponentially due to feedback loops.</li>
+<li><em>Machine learning can amplify bias</em>:: Human bias can lead to larger amounts of machine learning bias.</li>
+<li><em>Algorithms &amp; humans are used differently</em>:: Human decision makers and algorithmic decision makers are not used in a plug-and-play interchangeable way in practice.</li>
+<li><em>Technology is power</em>:: And with that comes responsibility.</li>
+</ul>
+<p>As the Arkansas healthcare example showed, machine learning is often implemented in practice not because it leads to better outcomes, but because it is cheaper and more efficient. Cathy O’Neill, in her book <em>Weapons of Math Destruction</em> (Crown), described the pattern of how the privileged are processed by people, whereas the poor are processed by algorithms. This is just one of a number of ways that algorithms are used differently than human decision makers. Others include:</p>
+<ul>
+<li>People are more likely to assume algorithms are objective or error-free (even if they’re given the option of a human override).</li>
+<li>Algorithms are more likely to be implemented with no appeals process in place.</li>
+<li>Algorithms are often used at scale.</li>
+<li>Algorithmic systems are cheap.</li>
+</ul>
+<p>Even in the absence of bias, algorithms (and deep learning especially, since it is such an effective and scalable algorithm) can lead to negative societal problems, such as when used for <em>disinformation</em>.</p>
+</section>
+<section id="disinformation" class="level3">
+<h3 class="anchored" data-anchor-id="disinformation">Disinformation</h3>
+<p><em>Disinformation</em> has a history stretching back hundreds or even thousands of years. It is not necessarily about getting someone to believe something false, but rather often used to sow disharmony and uncertainty, and to get people to give up on seeking the truth. Receiving conflicting accounts can lead people to assume that they can never know whom or what to trust.</p>
+<p>Some people think disinformation is primarily about false information or <em>fake news</em>, but in reality, disinformation can often contain seeds of truth, or half-truths taken out of context. Ladislav Bittman was an intelligence officer in the USSR who later defected to the US and wrote some books in the 1970s and 1980s on the role of disinformation in Soviet propaganda operations. In <em>The KGB and Soviet Disinformation</em> (Pergamon) he wrote, “Most campaigns are a carefully designed mixture of facts, half-truths, exaggerations, and deliberate lies.”</p>
+<p>In the US this has hit close to home in recent years, with the FBI detailing a massive disinformation campaign linked to Russia in the 2016 election. Understanding the disinformation that was used in this campaign is very educational. For instance, the FBI found that the Russian disinformation campaign often organized two separate fake “grass roots” protests, one for each side of an issue, and got them to protest at the same time! The <a href="https://www.houstonchronicle.com/local/gray-matters/article/A-Houston-protest-organized-by-Russian-trolls-12625481.php"><em>Houston Chronicle</em></a> reported on one of these odd events (&lt;<texas>&gt;).</texas></p>
+<blockquote class="blockquote">
+<p>: A group that called itself the “Heart of Texas” had organized it on social media—a protest, they said, against the “Islamization” of Texas. On one side of Travis Street, I found about 10 protesters. On the other side, I found around 50 counterprotesters. But I couldn’t find the rally organizers. No “Heart of Texas.” I thought that was odd, and mentioned it in the article: What kind of group is a no-show at its own event? Now I know why. Apparently, the rally’s organizers were in Saint Petersburg, Russia, at the time. “Heart of Texas” is one of the internet troll groups cited in Special Prosecutor Robert Mueller’s recent indictment of Russians attempting to tamper with the U.S. presidential election.</p>
+</blockquote>
+<p><img src="images/ethics/image13.png" id="texas" caption="Event organized by the group Heart of Texas" alt="Screenshot of an event organized by the group Heart of Texas" width="300"></p>
+<p>Disinformation often involves coordinated campaigns of inauthentic behavior. For instance, fraudulent accounts may try to make it seem like many people hold a particular viewpoint. While most of us like to think of ourselves as independent-minded, in reality we evolved to be influenced by others in our in-group, and in opposition to those in our out-group. Online discussions can influence our viewpoints, or alter the range of what we consider acceptable viewpoints. Humans are social animals, and as social animals we are extremely influenced by the people around us. Increasingly, radicalization occurs in online environments; influence is coming from people in the virtual space of online forums and social networks.</p>
+<p>Disinformation through autogenerated text is a particularly significant issue, due to the greatly increased capability provided by deep learning. We discuss this issue in depth when we delve into creating language models, in &lt;<chapter_nlp>&gt;.</chapter_nlp></p>
+<p>One proposed approach is to develop some form of digital signature, to implement it in a seamless way, and to create norms that we should only trust content that has been verified. The head of the Allen Institute on AI, Oren Etzioni, wrote such a proposal in an article titled <a href="https://hbr.org/2019/03/how-will-we-prevent-ai-based-forgery">“How Will We Prevent AI-Based Forgery?”</a>: “AI is poised to make high-fidelity forgery inexpensive and automated, leading to potentially disastrous consequences for democracy, security, and society. The specter of AI forgery means that we need to act to make digital signatures de rigueur as a means of authentication of digital content.”</p>
+<p>Whilst we can’t hope to discuss all the ethical issues that deep learning, and algorithms more generally, brings up, hopefully this brief introduction has been a useful starting point you can build on. We’ll now move on to the questions of how to identify ethical issues, and what to do about them.</p>
+</section>
+</section>
+<section id="identifying-and-addressing-ethical-issues" class="level2" data-number="3.4">
+<h2 data-number="3.4" class="anchored" data-anchor-id="identifying-and-addressing-ethical-issues"><span class="header-section-number">3.4</span> Identifying and Addressing Ethical Issues</h2>
+<p>Mistakes happen. Finding out about them, and dealing with them, needs to be part of the design of any system that includes machine learning (and many other systems too). The issues raised within data ethics are often complex and interdisciplinary, but it is crucial that we work to address them.</p>
+<p>So what can we do? This is a big topic, but a few steps towards addressing ethical issues are:</p>
+<ul>
+<li>Analyze a project you are working on.</li>
+<li>Implement processes at your company to find and address ethical risks.</li>
+<li>Support good policy.</li>
+<li>Increase diversity.</li>
+</ul>
+<p>Let’s walk through each of these steps, starting with analyzing a project you are working on.</p>
+<section id="analyze-a-project-you-are-working-on" class="level3">
+<h3 class="anchored" data-anchor-id="analyze-a-project-you-are-working-on">Analyze a Project You Are Working On</h3>
+<p>It’s easy to miss important issues when considering ethical implications of your work. One thing that helps enormously is simply asking the right questions. Rachel Thomas recommends considering the following questions throughout the development of a data project:</p>
+<ul>
+<li>Should we even be doing this?</li>
+<li>What bias is in the data?</li>
+<li>Can the code and data be audited?</li>
+<li>What are the error rates for different sub-groups?</li>
+<li>What is the accuracy of a simple rule-based alternative?</li>
+<li>What processes are in place to handle appeals or mistakes?</li>
+<li>How diverse is the team that built it?</li>
+</ul>
+<p>These questions may be able to help you identify outstanding issues, and possible alternatives that are easier to understand and control. In addition to asking the right questions, it’s also important to consider practices and processes to implement.</p>
+<p>One thing to consider at this stage is what data you are collecting and storing. Data often ends up being used for different purposes than what it was originally collected for. For instance, IBM began selling to Nazi Germany well before the Holocaust, including helping with Germany’s 1933 census conducted by Adolf Hitler, which was effective at identifying far more Jewish people than had previously been recognized in Germany. Similarly, US census data was used to round up Japanese-Americans (who were US citizens) for internment during World War II. It is important to recognize how data and images collected can be weaponized later. Columbia professor&nbsp;<a href="https://www.nytimes.com/2019/04/10/opinion/sunday/privacy-capitalism.html">Tim Wu wrote</a>&nbsp;that&nbsp;“You must assume that any personal data that Facebook or Android keeps are data that governments around the world will try to get or that thieves will try to steal.”</p>
+</section>
+<section id="processes-to-implement" class="level3">
+<h3 class="anchored" data-anchor-id="processes-to-implement">Processes to Implement</h3>
+<p>The Markkula Center has released <a href="https://www.scu.edu/ethics-in-technology-practice/ethical-toolkit/">An Ethical Toolkit for Engineering/Design Practice</a> that includes some concrete practices to implement at your company, including regularly scheduled sweeps to proactively search for ethical risks (in a manner similar to cybersecurity penetration testing), expanding the ethical circle to include the perspectives of a variety of stakeholders, and considering the terrible people (how could bad actors abuse, steal, misinterpret, hack, destroy, or weaponize what you are building?).</p>
+<p>Even if you don’t have a diverse team, you can still try to pro-actively include the perspectives of a wider group, considering questions such as these (provided by the Markkula Center):</p>
+<ul>
+<li>Whose interests, desires, skills, experiences, and values have we simply&nbsp;assumed, rather than actually&nbsp;consulted?</li>
+<li>Who are all the stakeholders who will be directly affected by our product? How have their interests been protected? How do we know what their interests&nbsp;really&nbsp;are—have we&nbsp;asked?</li>
+<li>Who/which groups and individuals will be&nbsp;indirectly&nbsp;affected in significant ways?</li>
+<li>Who might use this product that we didn’t&nbsp;expect&nbsp;to use it, or for purposes we didn’t initially&nbsp;intend?</li>
+</ul>
+<section id="ethical-lenses" class="level4">
+<h4 class="anchored" data-anchor-id="ethical-lenses">Ethical lenses</h4>
+<p>Another useful resource from the Markkula Center is its <a href="https://www.scu.edu/ethics-in-technology-practice/ethical-lenses/">Conceptual Frameworks in Technology and Engineering Practice</a>. This considers how different foundational ethical lenses can help identify concrete issues, and lays out the following approaches and key questions:</p>
+<ul>
+<li>The rights approach:: Which option best respects the rights of all who have a stake?</li>
+<li>The justice approach:: Which option treats people equally or proportionately?</li>
+<li>The utilitarian approach:: Which option will produce the most good and do the least harm?</li>
+<li>The common good approach:: Which option best serves the community as a whole, not just some members?</li>
+<li>The virtue approach:: Which option leads me to act as the sort of person I want to be?</li>
+</ul>
+<p>Markkula’s recommendations include a deeper dive into each of these perspectives, including looking at a project through the lenses of its <em>consequences</em>:</p>
+<ul>
+<li>Who will be directly affected by this project? Who will be&nbsp;indirectly&nbsp;affected?</li>
+<li>Will the effects in aggregate likely create more good than harm, and what&nbsp;types&nbsp;of good and harm?</li>
+<li>Are we thinking about&nbsp;all&nbsp;relevant types of harm/benefit (psychological, political, environmental, moral, cognitive, emotional, institutional, cultural)?</li>
+<li>How might future generations be affected by this project?</li>
+<li>Do the risks of harm from this project fall disproportionately on the least powerful in society? Will the benefits go disproportionately to the well-off?</li>
+<li>Have we adequately considered “dual-use”?</li>
+</ul>
+<p>The alternative lens to this is the <em>deontological</em> perspective, which focuses on basic concepts of <em>right</em> and <em>wrong</em>:</p>
+<ul>
+<li>What&nbsp;rights&nbsp;of others and&nbsp;duties&nbsp;to others must we respect?</li>
+<li>How might the&nbsp;dignity&nbsp;and&nbsp;autonomy&nbsp;of each stakeholder be impacted by this project?</li>
+<li>What considerations of&nbsp;trust&nbsp;and of&nbsp;justice&nbsp;are relevant to this design/project?</li>
+<li>Does this project involve any conflicting moral duties to others, or conflicting stakeholder rights? How can we prioritize these?</li>
+</ul>
+<p>One of the best ways to help come up with complete and thoughtful answers to questions like these is to ensure that the people asking the questions are <em>diverse</em>.</p>
+</section>
+</section>
+<section id="the-power-of-diversity" class="level3">
+<h3 class="anchored" data-anchor-id="the-power-of-diversity">The Power of Diversity</h3>
+<p>Currently, less than 12% of AI researchers are women, according to <a href="https://medium.com/element-ai-research-lab/estimating-the-gender-ratio-of-ai-researchers-around-the-world-81d2b8dbe9c3">a study from Element AI</a>. The statistics are similarly dire when it comes to race and age. When everybody on a team has similar backgrounds, they are likely to have similar blindspots around ethical risks. The <em>Harvard Business Review</em> (HBR) has published a number of studies showing many benefits of diverse teams, including:</p>
+<ul>
+<li><a href="https://hbr.org/2013/12/how-diversity-can-drive-innovation">“How Diversity Can Drive Innovation”</a></li>
+<li><a href="https://hbr.org/2017/03/teams-solve-problems-faster-when-theyre-more-cognitively-diverse">“Teams Solve Problems Faster When They’re More Cognitively Diverse”</a></li>
+<li><a href="https://hbr.org/2016/11/why-diverse-teams-are-smarter">“Why Diverse Teams Are Smarter”</a>, and</li>
+<li><a href="https://hbr.org/2011/06/defend-your-research-what-makes-a-team-smarter-more-women">“Defend Your Research: What Makes a Team Smarter? More Women”</a></li>
+</ul>
+<p>Diversity can lead to problems being identified earlier, and a wider range of solutions being considered. For instance, Tracy Chou was an early engineer at Quora. She <a href="https://qz.com/1016900/tracy-chou-leading-silicon-valley-engineer-explains-why-every-tech-worker-needs-a-humanities-education/">wrote of her experiences</a>, describing how she advocated internally for adding a feature that would allow trolls and other bad actors to be blocked. Chou recounts, “I was eager to work on the feature because I personally felt antagonized and abused on the site (gender isn’t an unlikely reason as to why)… But if I hadn’t had that personal perspective, it’s possible that the Quora team wouldn’t have prioritized building a block button so early in its existence.” Harassment often drives people from marginalized groups off online platforms, so this functionality has been important for maintaining the health of Quora’s community.</p>
+<p>A crucial aspect to understand is that women leave the tech industry at over twice the rate that men do, according to the <a href="https://www.researchgate.net/publication/268325574_By_RESEARCH_REPORT_The_Athena_Factor_Reversing_the_Brain_Drain_in_Science_Engineering_and_Technology"><em>Harvard Business Review</em></a> (41% of women working in tech leave, compared to 17% of men). An analysis of over 200 books, white papers, and articles found that the reason they leave is that “they’re treated unfairly; underpaid, less likely to be fast-tracked than their male colleagues, and unable to advance.”</p>
+<p>Studies have confirmed a number of the factors that make it harder for women to advance in the workplace. Women receive more&nbsp;vague feedback&nbsp;and&nbsp;personality criticism&nbsp;in performance evaluations,&nbsp;whereas men receive actionable advice tied to business outcomes (which is more useful). Women frequently experience being&nbsp;excluded from more creative and innovative roles, and not receiving high-visibility “stretch” assignments that are helpful in getting promoted. One study found that&nbsp;men’s voices are perceived&nbsp;as more persuasive, fact-based, and logical&nbsp;than women’s voices, even when reading identical scripts.</p>
+<p>Receiving mentorship has been statistically shown to help men advance, but not women. The reason behind this is that when women receive mentorship, it’s&nbsp;advice on how they should change&nbsp;and gain more self-knowledge.&nbsp;When men receive mentorship, it’s&nbsp;public endorsement&nbsp;of their authority. Guess which is more useful in getting promoted?</p>
+<p>As long as qualified women keep dropping out of tech, teaching more girls to code will not solve the diversity issues plaguing the field. Diversity initiatives often end up focusing primarily on white women, even though women of color face many additional barriers. In <a href="https://worklifelaw.org/publications/Double-Jeopardy-Report_v6_full_web-sm.pdf">interviews</a> with 60 women of color who work in STEM research, 100% had experienced discrimination.</p>
+<p>The hiring process is particularly broken in tech. One study indicative of the dysfunction comes from Triplebyte, a company that helps place software engineers in companies, conducting a standardized technical interview as part of this process. They have a fascinating dataset: the results of how over 300 engineers did on their exam, coupled with the results of how those engineers did during the interview process for a variety of companies. The number one finding from <a href="https://triplebyte.com/blog/who-y-combinator-companies-want">Triplebyte’s research</a> is that “the types of programmers that each company looks for often&nbsp;have little to do with what the company needs or does. Rather, they reflect company culture and the backgrounds of the founders.”</p>
+<p>This is a challenge for those trying to break into the world of deep learning, since most companies’ deep learning groups today were founded by academics. These groups tend to look for people “like them”—that is, people that can solve complex math problems and understand dense jargon. They don’t always know how to spot people who are actually good at solving real problems using deep learning.</p>
+<p>This leaves a big opportunity for companies that are ready to look beyond status and pedigree, and focus on results!</p>
+</section>
+<section id="fairness-accountability-and-transparency" class="level3">
+<h3 class="anchored" data-anchor-id="fairness-accountability-and-transparency">Fairness, Accountability, and Transparency</h3>
+<p>The professional society for computer scientists, the ACM, runs a data ethics conference called the Conference on Fairness, Accountability, and Transparency. “Fairness, Accountability, and Transparency” which used to go under the acronym <em>FAT</em> but now uses to the less objectionable <em>FAccT</em>. Microsoft has a group focused on “Fairness, Accountability, Transparency, and Ethics” (FATE). In this section, we’ll use “FAccT” to refer to the concepts of <em>Fairness, Accountability, and Transparency</em>.</p>
+<p>FAccT is another lens that you may find useful in considering ethical issues. One useful resource for this is the free online book <a href="https://fairmlbook.org/"><em>Fairness and Machine Learning: Limitations and Opportunities</em></a> by Solon Barocas, Moritz Hardt, and Arvind Narayanan, which “gives a perspective on machine learning that treats fairness as a central concern rather than an afterthought.” It also warns, however, that it “is intentionally narrow in scope… A narrow framing of machine learning ethics might be tempting to technologists and businesses as a way to focus on technical interventions while sidestepping deeper questions about power and accountability. We caution against this temptation.” Rather than provide an overview of the FAccT approach to ethics (which is better done in books such as that one), our focus here will be on the limitations of this kind of narrow framing.</p>
+<p>One great way to consider whether an ethical lens is complete is to try to come up with an example where the lens and our own ethical intuitions give diverging results. Os Keyes, Jevan Hutson, and Meredith Durbin explored this in a graphic way in their paper <a href="https://arxiv.org/abs/1908.06166">“A Mulching Proposal: Analysing and Improving an Algorithmic System for Turning the Elderly into High-Nutrient Slurry”</a>. The paper’s abstract says:</p>
+<blockquote class="blockquote">
+<p>: The ethical implications of algorithmic systems have been much discussed in both HCI and the broader community of those interested in technology design, development and policy. In this paper, we explore the application of one prominent ethical framework - Fairness, Accountability, and Transparency - to a proposed algorithm that resolves various societal issues around food security and population aging. Using various standardised forms of algorithmic audit and evaluation, we drastically increase the algorithm’s adherence to the FAT framework, resulting in a more ethical and beneficent system. We discuss how this might serve as a guide to other researchers or practitioners looking to ensure better ethical outcomes from algorithmic systems in their line of work.</p>
+</blockquote>
+<p>In this paper, the rather controversial proposal (“Turning the Elderly into High-Nutrient Slurry”) and the results (“drastically increase the algorithm’s adherence to the FAT framework, resulting in a more ethical and beneficent system”) are at odds… to say the least!</p>
+<p>In philosophy, and especially philosophy of ethics, this is one of the most effective tools: first, come up with a process, definition, set of questions, etc., which is designed to resolve some problem. Then try to come up with an example where that apparent solution results in a proposal that no one would consider acceptable. This can then lead to a further refinement of the solution.</p>
+<p>So far, we’ve focused on things that you and your organization can do. But sometimes individual or organizational action is not enough. Sometimes, governments also need to consider policy implications.</p>
+</section>
+</section>
+<section id="role-of-policy" class="level2" data-number="3.5">
+<h2 data-number="3.5" class="anchored" data-anchor-id="role-of-policy"><span class="header-section-number">3.5</span> Role of Policy</h2>
+<p>We often talk to people who are eager for technical or design fixes to be a full solution to the kinds of problems that we’ve been discussing; for instance, a technical approach to debias data, or design guidelines for making technology less addictive. While such measures can be useful, they will not be sufficient to address the underlying problems that have led to our current state. For example, as long as it is incredibly profitable to create addictive technology, companies will continue to do so, regardless of whether this has the side effect of promoting conspiracy theories and polluting our information ecosystem. While individual designers may try to tweak product designs, we will not see substantial changes until the underlying profit incentives change.</p>
+<section id="the-effectiveness-of-regulation" class="level3">
+<h3 class="anchored" data-anchor-id="the-effectiveness-of-regulation">The Effectiveness of Regulation</h3>
+<p>To look at what can cause companies to take concrete action, consider the following two examples of how Facebook has behaved. In 2018, a UN investigation found that Facebook had played a “determining role” in the ongoing genocide of the Rohingya, an ethnic minority in Mynamar described by UN Secretary-General Antonio Guterres as “one of, if not the, most discriminated people in the world.” Local activists had been warning Facebook executives that their platform was being used to spread hate speech and incite violence since as early as 2013. In 2015, they were warned that Facebook could play the same role in Myanmar that the radio broadcasts played during the Rwandan genocide (where a million people were killed). Yet, by the end of 2015, Facebook only employed four contractors that spoke Burmese. As one person close to the matter said, “That’s not 20/20 hindsight. The scale of this problem was significant and it was already apparent.” Zuckerberg promised during the congressional hearings to hire “dozens” to address the genocide in Myanmar (in 2018, years after the genocide had begun, including the destruction by fire of at least 288 villages in northern Rakhine state after August 2017).</p>
+<p>This stands in stark contrast to Facebook quickly <a href="http://thehill.com/policy/technology/361722-facebook-opens-second-german-office-to-comply-with-hate-speech-law">hiring 1,200 people in Germany</a> to try to avoid expensive penalties (of up to 50 million euros) under a new German law against hate speech. Clearly, in this case, Facebook was more reactive to the threat of a financial penalty than to the systematic destruction of an ethnic minority.</p>
+<p>In an <a href="https://idlewords.com/2019/06/the_new_wilderness.htm">article on privacy issues</a>, Maciej Ceglowski draws parallels with the environmental movement:</p>
+<blockquote class="blockquote">
+<p>: This regulatory project has been so successful in the First World that we risk forgetting what life was like before it. Choking smog of the kind that today kills thousands in Jakarta and Delhi was https://en.wikipedia.org/wiki/Pea_soup_fog[once emblematic of London]. The Cuyahoga River in Ohio used to http://www.ohiohistorycentral.org/w/Cuyahoga_River_Fire[reliably catch fire]. In a particularly horrific example of unforeseen consequences, tetraethyl lead added to gasoline https://en.wikipedia.org/wiki/Lead%E2%80%93crime_hypothesis[raised violent crime rates] worldwide for fifty years. None of these harms could have been fixed by telling people to vote with their wallet, or carefully review the environmental policies of every company they gave their business to, or to stop using the technologies in question. It took coordinated, and sometimes highly technical, regulation across jurisdictional boundaries to fix them. In some cases, like the https://en.wikipedia.org/wiki/Montreal_Protocol[ban on commercial refrigerants] that depleted the ozone layer, that regulation required a worldwide consensus. We’re at the point where we need a similar shift in perspective in our privacy law.</p>
+</blockquote>
+</section>
+<section id="rights-and-policy" class="level3">
+<h3 class="anchored" data-anchor-id="rights-and-policy">Rights and Policy</h3>
+<p>Clean air and clean drinking water are public goods which are nearly impossible to protect through individual market decisions, but rather require coordinated regulatory action. Similarly, many of the harms resulting from unintended consequences of misuses of technology involve public goods, such as a polluted information environment or deteriorated ambient privacy. Too often privacy is framed as an individual right, yet there are societal impacts to widespread surveillance (which would still be the case even if it was possible for a few individuals to opt out).</p>
+<p>Many of the issues we are seeing in tech are actually human rights issues, such as when a biased algorithm recommends that Black defendants have longer prison sentences, when particular job ads are only shown to young people, or when police use facial recognition to identify protesters. The appropriate venue to address human rights issues is typically through the law.</p>
+<p>We need both regulatory and legal changes, <em>and</em> the ethical behavior of individuals. Individual behavior change can’t address misaligned profit incentives, externalities (where corporations reap large profits while offloading their costs and harms to the broader society), or systemic failures. However, the law will never cover all edge cases, and it is important that individual software developers and data scientists are equipped to make ethical decisions in practice.</p>
+</section>
+<section id="cars-a-historical-precedent" class="level3">
+<h3 class="anchored" data-anchor-id="cars-a-historical-precedent">Cars: A Historical Precedent</h3>
+<p>The problems we are facing are complex, and there are no simple solutions. This can be discouraging, but we find hope in considering other large challenges that people have tackled throughout history. One example is the movement to increase car safety, covered as a case study in <a href="https://arxiv.org/abs/1803.09010">“Datasheets for Datasets”</a> by Timnit Gebru et al.&nbsp;and in the design podcast <a href="https://99percentinvisible.org/episode/nut-behind-wheel/">99% Invisible</a>. Early cars had no seatbelts, metal knobs on the dashboard that could lodge in people’s skulls during a crash, regular plate glass windows that shattered in dangerous ways, and non-collapsible steering columns that impaled drivers. However, car companies were incredibly resistant to even discussing the idea of safety as something they could help address, and the widespread belief was that cars are just the way they are, and that it was the people using them who caused problems.</p>
+<p>It took consumer safety activists and advocates decades of work to even change the national conversation to consider that perhaps car companies had some responsibility which should be addressed through regulation. When the collapsible steering column was invented, it was not implemented for several years as there was no financial incentive to do so. Major car company General Motors hired private detectives to try to dig up dirt on consumer safety advocate Ralph Nader. The requirement of seatbelts, crash test dummies, and collapsible steering columns were major victories. It was only in 2011 that car companies were required to start using crash test dummies that would represent the average woman, and not just average men’s bodies; prior to this, women were 40% more likely to be injured in a car crash of the same impact compared to a man. This is a vivid example of the ways that bias, policy, and technology have important consequences.</p>
+</section>
+</section>
+<section id="conclusion" class="level2" data-number="3.6">
+<h2 data-number="3.6" class="anchored" data-anchor-id="conclusion"><span class="header-section-number">3.6</span> Conclusion</h2>
+<p>Coming from a background of working with binary logic, the lack of clear answers in ethics can be frustrating at first. Yet, the implications of how our work impacts the world, including unintended consequences and the work becoming weaponized by bad actors, are some of the most important questions we can (and should!) consider. Even though there aren’t any easy answers, there are definite pitfalls to avoid and practices to follow to move toward more ethical behavior.</p>
+<p>Many people (including us!) are looking for more satisfying, solid answers about how to address harmful impacts of technology. However, given the complex, far-reaching, and interdisciplinary nature of the problems we are facing, there are no simple solutions. Julia Angwin, former senior reporter at ProPublica who focuses on issues of algorithmic bias and surveillance (and one of the 2016 investigators of the COMPAS recidivism algorithm that helped spark the field of FAccT) said in <a href="https://www.fastcompany.com/90337954/who-cares-about-liberty-julia-angwin-and-trevor-paglen-on-privacy-surveillance-and-the-mess-were-in">a 2019 interview</a>:</p>
+<blockquote class="blockquote">
+<p>: I strongly believe that in order to solve a problem, you have to diagnose it, and that we’re still in the diagnosis phase of this. If you think about the turn of the century and industrialization, we had, I don’t know, 30 years of child labor, unlimited work hours, terrible working conditions, and it took a lot of journalist muckraking and advocacy to diagnose the problem and have some understanding of what it was, and then the activism to get laws changed. I feel like we’re in a second industrialization of data information… I see my role as trying to make as clear as possible what the downsides are, and diagnosing them really accurately so that they can be solvable. That’s hard work, and lots more people need to be doing it.</p>
+</blockquote>
+<p>It’s reassuring that Angwin thinks we are largely still in the diagnosis phase: if your understanding of these problems feels incomplete, that is normal and natural. Nobody has a “cure” yet, although it is vital that we continue working to better understand and address the problems we are facing.</p>
+<p>One of our reviewers for this book, Fred Monroe, used to work in hedge fund trading. He told us, after reading this chapter, that many of the issues discussed here (distribution of data being dramatically different than what a model was trained on, the impact feedback loops on a model once deployed and at scale, and so forth) were also key issues for building profitable trading models. The kinds of things you need to do to consider societal consequences are going to have a lot of overlap with things you need to do to consider organizational, market, and customer consequences—so thinking carefully about ethics can also help you think carefully about how to make your data product successful more generally!</p>
+</section>
+<section id="questionnaire" class="level2" data-number="3.7">
+<h2 data-number="3.7" class="anchored" data-anchor-id="questionnaire"><span class="header-section-number">3.7</span> Questionnaire</h2>
+<ol type="1">
+<li>Does ethics provide a list of “right answers”?</li>
+<li>How can working with people of different backgrounds help when considering ethical questions?</li>
+<li>What was the role of IBM in Nazi Germany? Why did the company participate as it did? Why did the workers participate?</li>
+<li>What was the role of the first person jailed in the Volkswagen diesel scandal?</li>
+<li>What was the problem with a database of suspected gang members maintained by California law enforcement officials?</li>
+<li>Why did YouTube’s recommendation algorithm recommend videos of partially clothed children to pedophiles, even though no employee at Google had programmed this feature?</li>
+<li>What are the problems with the centrality of metrics?</li>
+<li>Why did Meetup.com not include gender in its recommendation system for tech meetups?</li>
+<li>What are the six types of bias in machine learning, according to Suresh and Guttag?</li>
+<li>Give two examples of historical race bias in the US.</li>
+<li>Where are most images in ImageNet from?</li>
+<li>In the paper <a href="https://scholar.harvard.edu/files/sendhil/files/aer.p20171084.pdf">“Does Machine Learning Automate Moral Hazard and Error”</a> why is sinusitis found to be predictive of a stroke?</li>
+<li>What is representation bias?</li>
+<li>How are machines and people different, in terms of their use for making decisions?</li>
+<li>Is disinformation the same as “fake news”?</li>
+<li>Why is disinformation through auto-generated text a particularly significant issue?</li>
+<li>What are the five ethical lenses described by the Markkula Center?</li>
+<li>Where is policy an appropriate tool for addressing data ethics issues?</li>
+</ol>
+<section id="further-research" class="level3">
+<h3 class="anchored" data-anchor-id="further-research">Further Research:</h3>
+<ol type="1">
+<li>Read the article “What Happens When an Algorithm Cuts Your Healthcare”. How could problems like this be avoided in the future?</li>
+<li>Research to find out more about YouTube’s recommendation system and its societal impacts. Do you think recommendation systems must always have feedback loops with negative results? What approaches could Google take to avoid them? What about the government?</li>
+<li>Read the paper <a href="https://arxiv.org/abs/1301.6822">“Discrimination in Online Ad Delivery”</a>. Do you think Google should be considered responsible for what happened to Dr.&nbsp;Sweeney? What would be an appropriate response?</li>
+<li>How can a cross-disciplinary team help avoid negative consequences?</li>
+<li>Read the paper “Does Machine Learning Automate Moral Hazard and Error”. What actions do you think should be taken to deal with the issues identified in this paper?</li>
+<li>Read the article “How Will We Prevent AI-Based Forgery?” Do you think Etzioni’s proposed approach could work? Why?</li>
+<li>Complete the section “Analyze a Project You Are Working On” in this chapter.</li>
+<li>Consider whether your team could be more diverse. If so, what approaches might help?</li>
+</ol>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/fastai\.github\.io\/fastbook2e");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./book2.html" class="pagination-link" aria-label="*From Model to Production*">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title"><em>From Model to Production</em></span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./mnist_basics.html" class="pagination-link" aria-label="Under the Hood: Training a Digit Classifier">
+        <span class="nav-page-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Under the Hood: Training a Digit Classifier</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

@@ -1,0 +1,1974 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.1">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>13&nbsp; Convolutional Neural Networks – Practical Deep Learning for Coders</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./resnet.html" rel="next">
+<link href="./book12.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="styles.css">
+<meta property="og:title" content="13&nbsp; Convolutional Neural Networks – Practical Deep Learning for Coders">
+<meta property="og:description" content="">
+<meta property="og:image" content="https://fastai.github.io/fastbook2e/images/att_00035.png">
+<meta property="og:site_name" content="Practical Deep Learning for Coders">
+<meta property="og:image:height" content="653">
+<meta property="og:image:width" content="732">
+<meta name="twitter:title" content="13&nbsp; Convolutional Neural Networks – Practical Deep Learning for Coders">
+<meta name="twitter:description" content="">
+<meta name="twitter:image" content="https://fastai.github.io/fastbook2e/images/att_00035.png">
+<meta name="twitter:creator" content="jeremyphoward">
+<meta name="twitter:site" content="fastdotai">
+<meta name="twitter:image-height" content="653">
+<meta name="twitter:image-width" content="732">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./book11.html">From the Foundations</a></li><li class="breadcrumb-item"><a href="./convolutions.html"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Convolutional Neural Networks</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Practical Deep Learning for Coders</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Getting Started</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./intro.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Your Deep Learning Journey</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./book2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title"><em>From Model to Production</em></span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./book3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">AI and Data Ethics</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">The Details</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mnist_basics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Under the Hood: Training a Digit Classifier</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./book5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title"><em>Image Classification</em></span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./book6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title"><em>Other Computer Vision Problems</em></span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./book7.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title"><em>Training a State-of-the-Art Model</em></span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./book8.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title"><em>Collaborative Filtering Deep Dive</em></span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./book9.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title"><em>Tabular Modeling Deep Dive</em></span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./book10.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title"><em>NLP Deep Dive: RNNs</em></span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">From the Foundations</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./book11.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title"><em>Data Munging with fastai’s Mid-Level API</em></span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./book12.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title"><em>A Language Model from Scratch</em></span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./convolutions.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Convolutional Neural Networks</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./resnet.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">ResNets</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./book15.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title"><em>Application Architectures Deep Dive</em></span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accel_sgd.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">The Training Process</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./foundations.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">A Neural Net from the Foundations</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./book18.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title"><em>CNN Interpretation with CAM</em></span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./book19.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title"><em>A fastai Learner from Scratch</em></span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./book20.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title"><em>Concluding Thoughts</em></span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#the-magic-of-convolutions" id="toc-the-magic-of-convolutions" class="nav-link active" data-scroll-target="#the-magic-of-convolutions"><span class="header-section-number">13.1</span> The Magic of Convolutions</a>
+  <ul class="collapse">
+  <li><a href="#mapping-a-convolution-kernel" id="toc-mapping-a-convolution-kernel" class="nav-link" data-scroll-target="#mapping-a-convolution-kernel">Mapping a Convolution Kernel</a></li>
+  <li><a href="#convolutions-in-pytorch" id="toc-convolutions-in-pytorch" class="nav-link" data-scroll-target="#convolutions-in-pytorch">Convolutions in PyTorch</a></li>
+  <li><a href="#strides-and-padding" id="toc-strides-and-padding" class="nav-link" data-scroll-target="#strides-and-padding">Strides and Padding</a></li>
+  <li><a href="#understanding-the-convolution-equations" id="toc-understanding-the-convolution-equations" class="nav-link" data-scroll-target="#understanding-the-convolution-equations">Understanding the Convolution Equations</a></li>
+  </ul></li>
+  <li><a href="#our-first-convolutional-neural-network" id="toc-our-first-convolutional-neural-network" class="nav-link" data-scroll-target="#our-first-convolutional-neural-network"><span class="header-section-number">13.2</span> Our First Convolutional Neural Network</a>
+  <ul class="collapse">
+  <li><a href="#creating-the-cnn" id="toc-creating-the-cnn" class="nav-link" data-scroll-target="#creating-the-cnn">Creating the CNN</a></li>
+  <li><a href="#understanding-convolution-arithmetic" id="toc-understanding-convolution-arithmetic" class="nav-link" data-scroll-target="#understanding-convolution-arithmetic">Understanding Convolution Arithmetic</a></li>
+  <li><a href="#receptive-fields" id="toc-receptive-fields" class="nav-link" data-scroll-target="#receptive-fields">Receptive Fields</a></li>
+  <li><a href="#a-note-about-twitter" id="toc-a-note-about-twitter" class="nav-link" data-scroll-target="#a-note-about-twitter">A Note About Twitter</a></li>
+  </ul></li>
+  <li><a href="#color-images" id="toc-color-images" class="nav-link" data-scroll-target="#color-images"><span class="header-section-number">13.3</span> Color Images</a></li>
+  <li><a href="#improving-training-stability" id="toc-improving-training-stability" class="nav-link" data-scroll-target="#improving-training-stability"><span class="header-section-number">13.4</span> Improving Training Stability</a>
+  <ul class="collapse">
+  <li><a href="#a-simple-baseline" id="toc-a-simple-baseline" class="nav-link" data-scroll-target="#a-simple-baseline">A Simple Baseline</a></li>
+  <li><a href="#increase-batch-size" id="toc-increase-batch-size" class="nav-link" data-scroll-target="#increase-batch-size">Increase Batch Size</a></li>
+  <li><a href="#cycle-training" id="toc-cycle-training" class="nav-link" data-scroll-target="#cycle-training">1cycle Training</a></li>
+  <li><a href="#batch-normalization" id="toc-batch-normalization" class="nav-link" data-scroll-target="#batch-normalization">Batch Normalization</a></li>
+  </ul></li>
+  <li><a href="#conclusions" id="toc-conclusions" class="nav-link" data-scroll-target="#conclusions"><span class="header-section-number">13.5</span> Conclusions</a></li>
+  <li><a href="#questionnaire" id="toc-questionnaire" class="nav-link" data-scroll-target="#questionnaire"><span class="header-section-number">13.6</span> Questionnaire</a>
+  <ul class="collapse">
+  <li><a href="#further-research" id="toc-further-research" class="nav-link" data-scroll-target="#further-research">Further Research</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./book11.html">From the Foundations</a></li><li class="breadcrumb-item"><a href="./convolutions.html"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Convolutional Neural Networks</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span id="sec-convolutions" class="quarto-section-identifier"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Convolutional Neural Networks</span></span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>In <a href="mnist_basics.html" class="quarto-xref"><span>Chapter 4</span></a> we learned how to create a neural network recognizing images. We were able to achieve a bit over 98% accuracy at distinguishing 3s from 7s—but we also saw that fastai’s built-in classes were able to get close to 100%. Let’s start trying to close the gap.</p>
+<p>In this chapter, we will begin by digging into what convolutions are and building a CNN from scratch. We will then study a range of techniques to improve training stability and learn all the tweaks the library usually applies for us to get great results.</p>
+<section id="the-magic-of-convolutions" class="level2" data-number="13.1">
+<h2 data-number="13.1" class="anchored" data-anchor-id="the-magic-of-convolutions"><span class="header-section-number">13.1</span> The Magic of Convolutions</h2>
+<p>One of the most powerful tools that machine learning practitioners have at their disposal is <em>feature engineering</em>. A <em>feature</em> is a transformation of the data which is designed to make it easier to model. For instance, the <code>add_datepart</code> function that we used for our tabular dataset preprocessing in <a href="book9.html" class="quarto-xref"><span>Chapter 9</span></a> added date features to the Bulldozers dataset. What kinds of features might we be able to create from images?</p>
+<blockquote class="blockquote">
+<p>jargon: Feature engineering: Creating new transformations of the input data in order to make it easier to model.</p>
+</blockquote>
+<p>In the context of an image, a feature is a visually distinctive attribute. For example, the number 7 is characterized by a horizontal edge near the top of the digit, and a top-right to bottom-left diagonal edge underneath that. On the other hand, the number 3 is characterized by a diagonal edge in one direction at the top left and bottom right of the digit, the opposite diagonal at the bottom left and top right, horizontal edges at the middle, top, and bottom, and so forth. So what if we could extract information about where the edges occur in each image, and then use that information as our features, instead of raw pixels?</p>
+<p>It turns out that finding the edges in an image is a very common task in computer vision, and is surprisingly straightforward. To do it, we use something called a <em>convolution</em>. A convolution requires nothing more than multiplication, and addition—two operations that are responsible for the vast majority of work that we will see in every single deep learning model in this book!</p>
+<p>A convolution applies a <em>kernel</em> across an image. A kernel is a little matrix, such as the 3×3 matrix in the top right of <a href="#fig-basic-conv" class="quarto-xref">Figure&nbsp;<span>13.1</span></a>.</p>
+<div id="fig-basic-conv" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Applying a kernel to one location">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-basic-conv-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/chapter9_conv_basic.png" class="img-fluid figure-img" alt="Applying a kernel to one location" width="700">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-basic-conv-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;13.1: Applying a kernel to one location
+</figcaption>
+</figure>
+</div>
+<p>The 7×7 grid to the left is the <em>image</em> we’re going to apply the kernel to. The convolution operation multiplies each element of the kernel by each element of a 3×3 block of the image. The results of these multiplications are then added together. The diagram in <a href="#fig-basic-conv" class="quarto-xref">Figure&nbsp;<span>13.1</span></a> shows an example of applying a kernel to a single location in the image, the 3×3 block around cell 18.</p>
+<p>Let’s do this with code. First, we create a little 3×3 matrix like so:</p>
+<div id="cell-10" class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>top_edge <span class="op">=</span> tensor([[<span class="op">-</span><span class="dv">1</span>,<span class="op">-</span><span class="dv">1</span>,<span class="op">-</span><span class="dv">1</span>],</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>                   [ <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>],</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>                   [ <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>]]).<span class="bu">float</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We’re going to call this our kernel (because that’s what fancy computer vision researchers call these). And we’ll need an image, of course:</p>
+<div id="cell-12" class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>path <span class="op">=</span> untar_data(URLs.MNIST_SAMPLE)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-14" class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>im3 <span class="op">=</span> Image.<span class="bu">open</span>(path<span class="op">/</span><span class="st">'train'</span><span class="op">/</span><span class="st">'3'</span><span class="op">/</span><span class="st">'12.png'</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>show_image(im3)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="convolutions_files/figure-html/cell-7-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Now we’re going to take the top 3×3-pixel square of our image, and multiply each of those values by each item in our kernel. Then we’ll add them up, like so:</p>
+<div id="cell-16" class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>im3_t <span class="op">=</span> tensor(im3)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>im3_t[<span class="dv">0</span>:<span class="dv">3</span>,<span class="dv">0</span>:<span class="dv">3</span>] <span class="op">*</span> top_edge</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>tensor([[-0., -0., -0.],
+        [0., 0., 0.],
+        [0., 0., 0.]])</code></pre>
+</div>
+</div>
+<div id="cell-17" class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>(im3_t[<span class="dv">0</span>:<span class="dv">3</span>,<span class="dv">0</span>:<span class="dv">3</span>] <span class="op">*</span> top_edge).<span class="bu">sum</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>tensor(0.)</code></pre>
+</div>
+</div>
+<p>Not very interesting so far—all the pixels in the top-left corner are white. But let’s pick a couple of more interesting spots:</p>
+<div id="cell-19" class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.DataFrame(im3_t[:<span class="dv">10</span>,:<span class="dv">20</span>])</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>df.style.set_properties(<span class="op">**</span>{<span class="st">'font-size'</span>:<span class="st">'6pt'</span>}).background_gradient(<span class="st">'Greys'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><img src="images/att_00059.png" class="img-fluid" alt="Top section of a digit" width="490"></p>
+<p>There’s a top edge at cell 5,8. Let’s repeat our calculation there:</p>
+<div id="cell-22" class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>(im3_t[<span class="dv">4</span>:<span class="dv">7</span>,<span class="dv">6</span>:<span class="dv">9</span>] <span class="op">*</span> top_edge).<span class="bu">sum</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>tensor(762.)</code></pre>
+</div>
+</div>
+<p>There’s a right edge at cell 8,18. What does that give us?:</p>
+<div id="cell-24" class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>(im3_t[<span class="dv">7</span>:<span class="dv">10</span>,<span class="dv">17</span>:<span class="dv">20</span>] <span class="op">*</span> top_edge).<span class="bu">sum</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>tensor(-29.)</code></pre>
+</div>
+</div>
+<p>As you can see, this little calculation is returning a high number where the 3×3-pixel square represents a top edge (i.e., where there are low values at the top of the square, and high values immediately underneath). That’s because the <code>-1</code> values in our kernel have little impact in that case, but the <code>1</code> values have a lot.</p>
+<p>Let’s look a tiny bit at the math. The filter will take any window of size 3×3 in our images, and if we name the pixel values like this:</p>
+<p><span class="math display">\[\begin{matrix} a1 &amp; a2 &amp; a3 \\ a4 &amp; a5 &amp; a6 \\ a7 &amp; a8 &amp; a9 \end{matrix}\]</span></p>
+<p>it will return <span class="math inline">\(-a1-a2-a3+a7+a8+a9\)</span>. If we are in a part of the image where <span class="math inline">\(a1\)</span>, <span class="math inline">\(a2\)</span>, and <span class="math inline">\(a3\)</span> add up to the same as <span class="math inline">\(a7\)</span>, <span class="math inline">\(a8\)</span>, and <span class="math inline">\(a9\)</span>, then the terms will cancel each other out and we will get 0. However, if <span class="math inline">\(a7\)</span> is greater than <span class="math inline">\(a1\)</span>, <span class="math inline">\(a8\)</span> is greater than <span class="math inline">\(a2\)</span>, and <span class="math inline">\(a9\)</span> is greater than <span class="math inline">\(a3\)</span>, we will get a bigger number as a result. So this filter detects horizontal edges—more precisely, edges where we go from bright parts of the image at the top to darker parts at the bottom.</p>
+<p>Changing our filter to have the row of <code>1</code>s at the top and the <code>-1</code>s at the bottom would detect horizontal edges that go from dark to light. Putting the <code>1</code>s and <code>-1</code>s in columns versus rows would give us filters that detect vertical edges. Each set of weights will produce a different kind of outcome.</p>
+<p>Let’s create a function to do this for one location, and check it matches our result from before:</p>
+<div id="cell-26" class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> apply_kernel(row, col, kernel):</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> (im3_t[row<span class="op">-</span><span class="dv">1</span>:row<span class="op">+</span><span class="dv">2</span>,col<span class="op">-</span><span class="dv">1</span>:col<span class="op">+</span><span class="dv">2</span>] <span class="op">*</span> kernel).<span class="bu">sum</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-27" class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>apply_kernel(<span class="dv">5</span>,<span class="dv">7</span>,top_edge)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>tensor(762.)</code></pre>
+</div>
+</div>
+<p>But note that we can’t apply it to the corner (e.g., location 0,0), since there isn’t a complete 3×3 square there.</p>
+<section id="mapping-a-convolution-kernel" class="level3">
+<h3 class="anchored" data-anchor-id="mapping-a-convolution-kernel">Mapping a Convolution Kernel</h3>
+<p>We can map <code>apply_kernel()</code> across the coordinate grid. That is, we’ll be taking our 3×3 kernel, and applying it to each 3×3 section of our image. For instance, <a href="#fig-nopad-conv" class="quarto-xref">Figure&nbsp;<span>13.2</span></a> shows the positions a 3×3 kernel can be applied to in the first row of a 5×5 image.</p>
+<div id="fig-nopad-conv" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Applying a kernel across a grid">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-nopad-conv-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/chapter9_nopadconv.svg" class="img-fluid figure-img" alt="Applying a kernel across a grid" width="400">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-nopad-conv-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;13.2: Applying a kernel across a grid
+</figcaption>
+</figure>
+</div>
+<p>To get a grid of coordinates we can use a <em>nested list comprehension</em>, like so:</p>
+<div id="cell-33" class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>[[(i,j) <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>,<span class="dv">5</span>)] <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>,<span class="dv">5</span>)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>[[(1, 1), (1, 2), (1, 3), (1, 4)],
+ [(2, 1), (2, 2), (2, 3), (2, 4)],
+ [(3, 1), (3, 2), (3, 3), (3, 4)],
+ [(4, 1), (4, 2), (4, 3), (4, 4)]]</code></pre>
+</div>
+</div>
+<blockquote class="blockquote">
+<p>note: Nested List Comprehensions: Nested list comprehensions are used a lot in Python, so if you haven’t seen them before, take a few minutes to make sure you understand what’s happening here, and experiment with writing your own nested list comprehensions.</p>
+</blockquote>
+<p>Here’s the result of applying our kernel over a coordinate grid:</p>
+<div id="cell-36" class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> <span class="bu">range</span>(<span class="dv">1</span>,<span class="dv">27</span>)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>top_edge3 <span class="op">=</span> tensor([[apply_kernel(i,j,top_edge) <span class="cf">for</span> j <span class="kw">in</span> rng] <span class="cf">for</span> i <span class="kw">in</span> rng])</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>show_image(top_edge3)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="convolutions_files/figure-html/cell-16-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Looking good! Our top edges are black, and bottom edges are white (since they are the <em>opposite</em> of top edges). Now that our image contains negative numbers too, <code>matplotlib</code> has automatically changed our colors so that white is the smallest number in the image, black the highest, and zeros appear as gray.</p>
+<p>We can try the same thing for left edges:</p>
+<div id="cell-38" class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>left_edge <span class="op">=</span> tensor([[<span class="op">-</span><span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">0</span>],</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>                    [<span class="op">-</span><span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">0</span>],</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>                    [<span class="op">-</span><span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">0</span>]]).<span class="bu">float</span>()</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>left_edge3 <span class="op">=</span> tensor([[apply_kernel(i,j,left_edge) <span class="cf">for</span> j <span class="kw">in</span> rng] <span class="cf">for</span> i <span class="kw">in</span> rng])</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>show_image(left_edge3)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="convolutions_files/figure-html/cell-17-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>As we mentioned before, a convolution is the operation of applying such a kernel over a grid in this way. In the paper <a href="https://arxiv.org/abs/1603.07285">“A Guide to Convolution Arithmetic for Deep Learning”</a> there are many great diagrams showing how image kernels can be applied. Here’s an example from the paper showing (at the bottom) a light blue 4×4 image, with a dark blue 3×3 kernel being applied, creating a 2×2 green output activation map at the top.</p>
+<div id="fig-three-ex-four-conv" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Result of applying a 3×3 kernel to a 4×4 image">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-three-ex-four-conv-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/att_00028.png" class="img-fluid figure-img" alt="Result of applying a 3×3 kernel to a 4×4 image" width="782">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-three-ex-four-conv-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;13.3: Result of applying a 3×3 kernel to a 4×4 image (courtesy of Vincent Dumoulin and Francesco Visin)
+</figcaption>
+</figure>
+</div>
+<p>Look at the shape of the result. If the original image has a height of <code>h</code> and a width of <code>w</code>, how many 3×3 windows can we find? As you can see from the example, there are <code>h-2</code> by <code>w-2</code> windows, so the image we get has a result as a height of <code>h-2</code> and a width of <code>w-2</code>.</p>
+<p>We won’t implement this convolution function from scratch, but use PyTorch’s implementation instead (it is way faster than anything we could do in Python).</p>
+</section>
+<section id="convolutions-in-pytorch" class="level3">
+<h3 class="anchored" data-anchor-id="convolutions-in-pytorch">Convolutions in PyTorch</h3>
+<p>Convolution is such an important and widely used operation that PyTorch has it built in. It’s called <code>F.conv2d</code> (recall that <code>F</code> is a fastai import from <code>torch.nn.functional</code>, as recommended by PyTorch). The PyTorch docs tell us that it includes these parameters:</p>
+<ul>
+<li>input:: input tensor of shape <code>(minibatch, in_channels, iH, iW)</code></li>
+<li>weight:: filters of shape <code>(out_channels, in_channels, kH, kW)</code></li>
+</ul>
+<p>Here <code>iH,iW</code> is the height and width of the image (i.e., <code>28,28</code>), and <code>kH,kW</code> is the height and width of our kernel (<code>3,3</code>). But apparently PyTorch is expecting rank-4 tensors for both these arguments, whereas currently we only have rank-2 tensors (i.e., matrices, or arrays with two axes).</p>
+<p>The reason for these extra axes is that PyTorch has a few tricks up its sleeve. The first trick is that PyTorch can apply a convolution to multiple images at the same time. That means we can call it on every item in a batch at once!</p>
+<p>The second trick is that PyTorch can apply multiple kernels at the same time. So let’s create the diagonal-edge kernels too, and then stack all four of our edge kernels into a single tensor:</p>
+<div id="cell-45" class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>diag1_edge <span class="op">=</span> tensor([[ <span class="dv">0</span>,<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>],</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>                     [<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">0</span>],</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>                     [ <span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>]]).<span class="bu">float</span>()</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>diag2_edge <span class="op">=</span> tensor([[ <span class="dv">1</span>,<span class="op">-</span><span class="dv">1</span>, <span class="dv">0</span>],</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>                     [ <span class="dv">0</span>, <span class="dv">1</span>,<span class="op">-</span><span class="dv">1</span>],</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>                     [ <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>]]).<span class="bu">float</span>()</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>edge_kernels <span class="op">=</span> torch.stack([left_edge, top_edge, diag1_edge, diag2_edge])</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>edge_kernels.shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>torch.Size([4, 3, 3])</code></pre>
+</div>
+</div>
+<p>To test this, we’ll need a <code>DataLoader</code> and a sample mini-batch. Let’s use the data block API:</p>
+<div id="cell-47" class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>mnist <span class="op">=</span> DataBlock((ImageBlock(cls<span class="op">=</span>PILImageBW), CategoryBlock), </span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>                  get_items<span class="op">=</span>get_image_files, </span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>                  splitter<span class="op">=</span>GrandparentSplitter(),</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>                  get_y<span class="op">=</span>parent_label)</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>dls <span class="op">=</span> mnist.dataloaders(path)</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>xb,yb <span class="op">=</span> first(dls.valid)</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>xb.shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>torch.Size([64, 1, 28, 28])</code></pre>
+</div>
+</div>
+<p>By default, fastai puts data on the GPU when using data blocks. Let’s move it to the CPU for our examples:</p>
+<div id="cell-49" class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>xb,yb <span class="op">=</span> to_cpu(xb),to_cpu(yb)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>One batch contains 64 images, each of 1 channel, with 28×28 pixels. <code>F.conv2d</code> can handle multichannel (i.e., color) images too. A <em>channel</em> is a single basic color in an image—for regular full-color images there are three channels, red, green, and blue. PyTorch represents an image as a rank-3 tensor, with dimensions <code>[channels, rows, columns]</code>.</p>
+<p>We’ll see how to handle more than one channel later in this chapter. Kernels passed to <code>F.conv2d</code> need to be rank-4 tensors: <code>[channels_in, features_out, rows, columns]</code>. <code>edge_kernels</code> is currently missing one of these. We need to tell PyTorch that the number of input channels in the kernel is one, which we can do by inserting an axis of size one (this is known as a <em>unit axis</em>) in the first location, where the PyTorch docs show <code>in_channels</code> is expected. To insert a unit axis into a tensor, we use the <code>unsqueeze</code> method:</p>
+<div id="cell-51" class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>edge_kernels.shape,edge_kernels.unsqueeze(<span class="dv">1</span>).shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>(torch.Size([4, 3, 3]), torch.Size([4, 1, 3, 3]))</code></pre>
+</div>
+</div>
+<p>This is now the correct shape for <code>edge_kernels</code>. Let’s pass this all to <code>conv2d</code>:</p>
+<div id="cell-53" class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>edge_kernels <span class="op">=</span> edge_kernels.unsqueeze(<span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-54" class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>batch_features <span class="op">=</span> F.conv2d(xb, edge_kernels)</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>batch_features.shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>torch.Size([64, 4, 26, 26])</code></pre>
+</div>
+</div>
+<p>The output shape shows we gave 64 images in the mini-batch, 4 kernels, and 26×26 edge maps (we started with 28×28 images, but lost one pixel from each side as discussed earlier). We can see we get the same results as when we did this manually:</p>
+<div id="cell-56" class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>show_image(batch_features[<span class="dv">0</span>,<span class="dv">0</span>])<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="convolutions_files/figure-html/cell-24-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The most important trick that PyTorch has up its sleeve is that it can use the GPU to do all this work in parallel—that is, applying multiple kernels, to multiple images, across multiple channels. Doing lots of work in parallel is critical to getting GPUs to work efficiently; if we did each of these operations one at a time, we’d often run hundreds of times slower (and if we used our manual convolution loop from the previous section, we’d be millions of times slower!). Therefore, to become a strong deep learning practitioner, one skill to practice is giving your GPU plenty of work to do at a time.</p>
+<p>It would be nice to not lose those two pixels on each axis. The way we do that is to add <em>padding</em>, which is simply additional pixels added around the outside of our image. Most commonly, pixels of zeros are added.</p>
+</section>
+<section id="strides-and-padding" class="level3">
+<h3 class="anchored" data-anchor-id="strides-and-padding">Strides and Padding</h3>
+<p>With appropriate padding, we can ensure that the output activation map is the same size as the original image, which can make things a lot simpler when we construct our architectures. <a href="#fig-pad-conv" class="quarto-xref">Figure&nbsp;<span>13.4</span></a> shows how adding padding allows us to apply the kernels in the image corners.</p>
+<div id="fig-pad-conv" class="quarto-float quarto-figure quarto-figure-center anchored" alt="A convolution with padding">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-pad-conv-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/chapter9_padconv.svg" class="img-fluid figure-img" alt="A convolution with padding" width="600">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-pad-conv-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;13.4: A convolution with padding
+</figcaption>
+</figure>
+</div>
+<p>With a 5×5 input, 4×4 kernel, and 2 pixels of padding, we end up with a 6×6 activation map, as we can see in <a href="#fig-four-by-five-conv" class="quarto-xref">Figure&nbsp;<span>13.5</span></a>.</p>
+<div id="fig-four-by-five-conv" class="quarto-float quarto-figure quarto-figure-center anchored" alt="A 4×4 kernel with 5×5 input and 2 pixels of padding">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-four-by-five-conv-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/att_00029.png" class="img-fluid figure-img" alt="A 4×4 kernel with 5×5 input and 2 pixels of padding" width="783">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-four-by-five-conv-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;13.5: A 4×4 kernel with 5×5 input and 2 pixels of padding (courtesy of Vincent Dumoulin and Francesco Visin)
+</figcaption>
+</figure>
+</div>
+<p>If we add a kernel of size <code>ks</code> by <code>ks</code> (with <code>ks</code> an odd number), the necessary padding on each side to keep the same shape is <code>ks//2</code>. An even number for <code>ks</code> would require a different amount of padding on the top/bottom and left/right, but in practice we almost never use an even filter size.</p>
+<p>So far, when we have applied the kernel to the grid, we have moved it one pixel over at a time. But we can jump further; for instance, we could move over two pixels after each kernel application, as in <a href="#fig-three-by-five-conv" class="quarto-xref">Figure&nbsp;<span>13.6</span></a>. This is known as a <em>stride-2</em> convolution. The most common kernel size in practice is 3×3, and the most common padding is 1. As you’ll see, stride-2 convolutions are useful for decreasing the size of our outputs, and stride-1 convolutions are useful for adding layers without changing the output size.</p>
+<div id="fig-three-by-five-conv" class="quarto-float quarto-figure quarto-figure-center anchored" alt="A 3×3 kernel with 5×5 input, stride-2 convolution, and 1 pixel of padding">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-three-by-five-conv-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/att_00030.png" class="img-fluid figure-img" alt="A 3×3 kernel with 5×5 input, stride-2 convolution, and 1 pixel of padding" width="774">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-three-by-five-conv-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;13.6: A 3×3 kernel with 5×5 input, stride-2 convolution, and 1 pixel of padding (courtesy of Vincent Dumoulin and Francesco Visin)
+</figcaption>
+</figure>
+</div>
+<p>In an image of size <code>h</code> by <code>w</code>, using a padding of 1 and a stride of 2 will give us a result of size <code>(h+1)//2</code> by <code>(w+1)//2</code>. The general formula for each dimension is <code>(n + 2*pad - ks)//stride + 1</code>, where <code>pad</code> is the padding, <code>ks</code>, the size of our kernel, and <code>stride</code> is the stride.</p>
+<p>Let’s now take a look at how the pixel values of the result of our convolutions are computed.</p>
+</section>
+<section id="understanding-the-convolution-equations" class="level3">
+<h3 class="anchored" data-anchor-id="understanding-the-convolution-equations">Understanding the Convolution Equations</h3>
+<p>To explain the math behind convolutions, fast.ai student Matt Kleinsmith came up with the very clever idea of showing <a href="https://medium.com/impactai/cnns-from-different-viewpoints-fab7f52d159c">CNNs from different viewpoints</a>. In fact, it’s so clever, and so helpful, we’re going to show it here too!</p>
+<p>Here’s our 3×3 pixel image, with each pixel labeled with a letter:</p>
+<p><img src="images/att_00032.png" class="img-fluid" alt="The image" width="75"></p>
+<p>And here’s our kernel, with each weight labeled with a Greek letter:</p>
+<p><img src="images/att_00033.png" class="img-fluid" alt="The kernel" width="55"></p>
+<p>Since the filter fits in the image four times, we have four results:</p>
+<p><img src="images/att_00034.png" class="img-fluid" alt="The activations" width="52"></p>
+<p><a href="#fig-apply-kernel" class="quarto-xref">Figure&nbsp;<span>13.7</span></a> shows how we applied the kernel to each section of the image to yield each result.</p>
+<div id="fig-apply-kernel" class="preview-image quarto-float quarto-figure quarto-figure-center anchored" alt="Applying the kernel">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-apply-kernel-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/att_00035.png" class="preview-image img-fluid figure-img" alt="Applying the kernel" width="366">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-apply-kernel-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;13.7: Applying the kernel
+</figcaption>
+</figure>
+</div>
+<p>The equation view is in <a href="#fig-eq-view" class="quarto-xref">Figure&nbsp;<span>13.8</span></a>.</p>
+<div id="fig-eq-view" class="quarto-float quarto-figure quarto-figure-center anchored" alt="The equation">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-eq-view-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/att_00036.png" class="img-fluid figure-img" alt="The equation" width="436">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-eq-view-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;13.8: The equation
+</figcaption>
+</figure>
+</div>
+<p>Notice that the bias term, <em>b</em>, is the same for each section of the image. You can consider the bias as part of the filter, just like the weights (α, β, γ, δ) are part of the filter.</p>
+<p>Here’s an interesting insight—a convolution can be represented as a special kind of matrix multiplication, as illustrated in <a href="#fig-conv-matmul" class="quarto-xref">Figure&nbsp;<span>13.9</span></a>. The weight matrix is just like the ones from traditional neural networks. However, this weight matrix has two special properties:</p>
+<ol type="1">
+<li>The zeros shown in gray are untrainable. This means that they’ll stay zero throughout the optimization process.</li>
+<li>Some of the weights are equal, and while they are trainable (i.e., changeable), they must remain equal. These are called <em>shared weights</em>.</li>
+</ol>
+<p>The zeros correspond to the pixels that the filter can’t touch. Each row of the weight matrix corresponds to one application of the filter.</p>
+<div id="fig-conv-matmul" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Convolution as matrix multiplication">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-conv-matmul-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/att_00038.png" class="img-fluid figure-img" alt="Convolution as matrix multiplication" width="683">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-conv-matmul-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;13.9: Convolution as matrix multiplication
+</figcaption>
+</figure>
+</div>
+<p>Now that we understand what a convolution is, let’s use them to build a neural net.</p>
+</section>
+</section>
+<section id="our-first-convolutional-neural-network" class="level2" data-number="13.2">
+<h2 data-number="13.2" class="anchored" data-anchor-id="our-first-convolutional-neural-network"><span class="header-section-number">13.2</span> Our First Convolutional Neural Network</h2>
+<p>There is no reason to believe that some particular edge filters are the most useful kernels for image recognition. Furthermore, we’ve seen that in later layers convolutional kernels become complex transformations of features from lower levels, but we don’t have a good idea of how to manually construct these.</p>
+<p>Instead, it would be best to learn the values of the kernels. We already know how to do this—SGD! In effect, the model will learn the features that are useful for classification.</p>
+<p>When we use convolutions instead of (or in addition to) regular linear layers we create a <em>convolutional neural network</em> (CNN).</p>
+<section id="creating-the-cnn" class="level3">
+<h3 class="anchored" data-anchor-id="creating-the-cnn">Creating the CNN</h3>
+<p>Let’s go back to the basic neural network we had in <a href="mnist_basics.html" class="quarto-xref"><span>Chapter 4</span></a>. It was defined like this:</p>
+<div id="cell-87" class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>simple_net <span class="op">=</span> nn.Sequential(</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>    nn.Linear(<span class="dv">28</span><span class="op">*</span><span class="dv">28</span>,<span class="dv">30</span>),</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>    nn.ReLU(),</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>    nn.Linear(<span class="dv">30</span>,<span class="dv">1</span>)</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We can view a model’s definition:</p>
+<div id="cell-89" class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>simple_net</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>Sequential(
+  (0): Linear(in_features=784, out_features=30, bias=True)
+  (1): ReLU()
+  (2): Linear(in_features=30, out_features=1, bias=True)
+)</code></pre>
+</div>
+</div>
+<p>We now want to create a similar architecture to this linear model, but using convolutional layers instead of linear. <code>nn.Conv2d</code> is the module equivalent of <code>F.conv2d</code>. It’s more convenient than <code>F.conv2d</code> when creating an architecture, because it creates the weight matrix for us automatically when we instantiate it.</p>
+<p>Here’s a possible architecture:</p>
+<div id="cell-91" class="cell">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>broken_cnn <span class="op">=</span> sequential(</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>    nn.Conv2d(<span class="dv">1</span>,<span class="dv">30</span>, kernel_size<span class="op">=</span><span class="dv">3</span>, padding<span class="op">=</span><span class="dv">1</span>),</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>    nn.ReLU(),</span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>    nn.Conv2d(<span class="dv">30</span>,<span class="dv">1</span>, kernel_size<span class="op">=</span><span class="dv">3</span>, padding<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>One thing to note here is that we didn’t need to specify 28×28 as the input size. That’s because a linear layer needs a weight in the weight matrix for every pixel, so it needs to know how many pixels there are, but a convolution is applied over each pixel automatically. The weights only depend on the number of input and output channels and the kernel size, as we saw in the previous section.</p>
+<p>Think about what the output shape is going to be, then let’s try it and see:</p>
+<div id="cell-93" class="cell">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>broken_cnn(xb).shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>torch.Size([64, 1, 28, 28])</code></pre>
+</div>
+</div>
+<p>This is not something we can use to do classification, since we need a single output activation per image, not a 28×28 map of activations. One way to deal with this is to use enough stride-2 convolutions such that the final layer is size 1. That is, after one stride-2 convolution the size will be 14×14, after two it will be 7×7, then 4×4, 2×2, and finally size 1.</p>
+<p>Let’s try that now. First, we’ll define a function with the basic parameters we’ll use in each convolution:</p>
+<div id="cell-95" class="cell">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> conv(ni, nf, ks<span class="op">=</span><span class="dv">3</span>, act<span class="op">=</span><span class="va">True</span>):</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>    res <span class="op">=</span> nn.Conv2d(ni, nf, stride<span class="op">=</span><span class="dv">2</span>, kernel_size<span class="op">=</span>ks, padding<span class="op">=</span>ks<span class="op">//</span><span class="dv">2</span>)</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> act: res <span class="op">=</span> nn.Sequential(res, nn.ReLU())</span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> res</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<blockquote class="blockquote">
+<p>important: Refactoring: Refactoring parts of your neural networks like this makes it much less likely you’ll get errors due to inconsistencies in your architectures, and makes it more obvious to the reader which parts of your layers are actually changing.</p>
+</blockquote>
+<p>When we use a stride-2 convolution, we often increase the number of features at the same time. This is because we’re decreasing the number of activations in the activation map by a factor of 4; we don’t want to decrease the capacity of a layer by too much at a time.</p>
+<blockquote class="blockquote">
+<p>jargon: channels and features: These two terms are largely used interchangeably, and refer to the size of the second axis of a weight matrix, which is, the number of activations per grid cell after a convolution. <em>Features</em> is never used to refer to the input data, but <em>channels</em> can refer to either the input data (generally channels are colors) or activations inside the network.</p>
+</blockquote>
+<p>Here is how we can build a simple CNN:</p>
+<div id="cell-100" class="cell">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>simple_cnn <span class="op">=</span> sequential(</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>    conv(<span class="dv">1</span> ,<span class="dv">4</span>),            <span class="co">#14x14</span></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>    conv(<span class="dv">4</span> ,<span class="dv">8</span>),            <span class="co">#7x7</span></span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>    conv(<span class="dv">8</span> ,<span class="dv">16</span>),           <span class="co">#4x4</span></span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>    conv(<span class="dv">16</span>,<span class="dv">32</span>),           <span class="co">#2x2</span></span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>    conv(<span class="dv">32</span>,<span class="dv">2</span>, act<span class="op">=</span><span class="va">False</span>), <span class="co">#1x1</span></span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>    Flatten(),</span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<blockquote class="blockquote">
+<p>j: I like to add comments like the ones here after each convolution to show how large the activation map will be after each layer. These comments assume that the input size is 28*28</p>
+</blockquote>
+<p>Now the network outputs two activations, which map to the two possible levels in our labels:</p>
+<div id="cell-103" class="cell">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>simple_cnn(xb).shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>torch.Size([64, 2])</code></pre>
+</div>
+</div>
+<p>We can now create our <code>Learner</code>:</p>
+<div id="cell-105" class="cell">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>learn <span class="op">=</span> Learner(dls, simple_cnn, loss_func<span class="op">=</span>F.cross_entropy, metrics<span class="op">=</span>accuracy)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>To see exactly what’s going on in the model, we can use <code>summary</code>:</p>
+<div id="cell-107" class="cell">
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>learn.summary()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>Sequential (Input shape: ['64 x 1 x 28 x 28'])
+================================================================
+Layer (type)         Output Shape         Param #    Trainable 
+================================================================
+Conv2d               64 x 4 x 14 x 14     40         True      
+________________________________________________________________
+ReLU                 64 x 4 x 14 x 14     0          False     
+________________________________________________________________
+Conv2d               64 x 8 x 7 x 7       296        True      
+________________________________________________________________
+ReLU                 64 x 8 x 7 x 7       0          False     
+________________________________________________________________
+Conv2d               64 x 16 x 4 x 4      1,168      True      
+________________________________________________________________
+ReLU                 64 x 16 x 4 x 4      0          False     
+________________________________________________________________
+Conv2d               64 x 32 x 2 x 2      4,640      True      
+________________________________________________________________
+ReLU                 64 x 32 x 2 x 2      0          False     
+________________________________________________________________
+Conv2d               64 x 2 x 1 x 1       578        True      
+________________________________________________________________
+Flatten              64 x 2               0          False     
+________________________________________________________________
+
+Total params: 6,722
+Total trainable params: 6,722
+Total non-trainable params: 0
+
+Optimizer used: &lt;function Adam&gt;
+Loss function: &lt;function cross_entropy&gt;
+
+Callbacks:
+  - TrainEvalCallback
+  - Recorder
+  - ProgressCallback</code></pre>
+</div>
+</div>
+<p>Note that the output of the final <code>Conv2d</code> layer is <code>64x2x1x1</code>. We need to remove those extra <code>1x1</code> axes; that’s what <code>Flatten</code> does. It’s basically the same as PyTorch’s <code>squeeze</code> method, but as a module.</p>
+<p>Let’s see if this trains! Since this is a deeper network than we’ve built from scratch before, we’ll use a lower learning rate and more epochs:</p>
+<div id="cell-109" class="cell">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>learn.fit_one_cycle(<span class="dv">2</span>, <span class="fl">0.01</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">epoch</th>
+<th data-quarto-table-cell-role="th">train_loss</th>
+<th data-quarto-table-cell-role="th">valid_loss</th>
+<th data-quarto-table-cell-role="th">accuracy</th>
+<th data-quarto-table-cell-role="th">time</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0</td>
+<td>0.072684</td>
+<td>0.045110</td>
+<td>0.990186</td>
+<td>00:05</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>0.022580</td>
+<td>0.030775</td>
+<td>0.990186</td>
+<td>00:05</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Success! It’s getting closer to the <code>resnet18</code> result we had, although it’s not quite there yet, and it’s taking more epochs, and we’re needing to use a lower learning rate. We still have a few more tricks to learn, but we’re getting closer and closer to being able to create a modern CNN from scratch.</p>
+</section>
+<section id="understanding-convolution-arithmetic" class="level3">
+<h3 class="anchored" data-anchor-id="understanding-convolution-arithmetic">Understanding Convolution Arithmetic</h3>
+<p>We can see from the summary that we have an input of size <code>64x1x28x28</code>. The axes are <code>batch,channel,height,width</code>. This is often represented as <code>NCHW</code> (where <code>N</code> refers to batch size). Tensorflow, on the other hand, uses <code>NHWC</code> axis order. The first layer is:</p>
+<div id="cell-113" class="cell">
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> learn.model[<span class="dv">0</span>]</span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>m</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>Sequential(
+  (0): Conv2d(1, 4, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
+  (1): ReLU()
+)</code></pre>
+</div>
+</div>
+<p>So we have 1 input channel, 4 output channels, and a 3×3 kernel. Let’s check the weights of the first convolution:</p>
+<div id="cell-115" class="cell">
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>m[<span class="dv">0</span>].weight.shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>torch.Size([4, 1, 3, 3])</code></pre>
+</div>
+</div>
+<p>The summary shows we have 40 parameters, and <code>4*1*3*3</code> is 36. What are the other four parameters? Let’s see what the bias contains:</p>
+<div id="cell-117" class="cell">
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>m[<span class="dv">0</span>].bias.shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>torch.Size([4])</code></pre>
+</div>
+</div>
+<p>We can now use this information to clarify our statement in the previous section: “When we use a stride-2 convolution, we often increase the number of features because we’re decreasing the number of activations in the activation map by a factor of 4; we don’t want to decrease the capacity of a layer by too much at a time.”</p>
+<p>There is one bias for each channel. (Sometimes channels are called <em>features</em> or <em>filters</em> when they are not input channels.) The output shape is <code>64x4x14x14</code>, and this will therefore become the input shape to the next layer. The next layer, according to <code>summary</code>, has 296 parameters. Let’s ignore the batch axis to keep things simple. So for each of <code>14*14=196</code> locations we are multiplying <code>296-8=288</code> weights (ignoring the bias for simplicity), so that’s <code>196*288=56_448</code> multiplications at this layer. The next layer will have <code>7*7*(1168-16)=56_448</code> multiplications.</p>
+<p>What happened here is that our stride-2 convolution halved the <em>grid size</em> from <code>14x14</code> to <code>7x7</code>, and we doubled the <em>number of filters</em> from 8 to 16, resulting in no overall change in the amount of computation. If we left the number of channels the same in each stride-2 layer, the amount of computation being done in the net would get less and less as it gets deeper. But we know that the deeper layers have to compute semantically rich features (such as eyes or fur), so we wouldn’t expect that doing <em>less</em> computation would make sense.</p>
+<p>Another way to think of this is based on receptive fields.</p>
+</section>
+<section id="receptive-fields" class="level3">
+<h3 class="anchored" data-anchor-id="receptive-fields">Receptive Fields</h3>
+<p>The <em>receptive field</em> is the area of an image that is involved in the calculation of a layer. On the <a href="https://book.fast.ai/">book’s website</a>, you’ll find an Excel spreadsheet called <em>conv-example.xlsx</em> that shows the calculation of two stride-2 convolutional layers using an MNIST digit. Each layer has a single kernel. <a href="#fig-preced1" class="quarto-xref">Figure&nbsp;<span>13.10</span></a> shows what we see if we click on one of the cells in the <em>conv2</em> section, which shows the output of the second convolutional layer, and click <em>trace precedents</em>.</p>
+<div id="fig-preced1" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Immediate precedents of conv2 layer">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-preced1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/att_00068.png" class="img-fluid figure-img" alt="Immediate precedents of conv2 layer" width="308">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-preced1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;13.10: Immediate precedents of Conv2 layer
+</figcaption>
+</figure>
+</div>
+<p>Here, the cell with the green border is the cell we clicked on, and the blue highlighted cells are its <em>precedents</em>—that is, the cells used to calculate its value. These cells are the corresponding 3×3 area of cells from the input layer (on the left), and the cells from the filter (on the right). Let’s now click <em>trace precedents</em> again, to see what cells are used to calculate these inputs. <a href="#fig-preced2" class="quarto-xref">Figure&nbsp;<span>13.11</span></a> shows what happens.</p>
+<div id="fig-preced2" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Secondary precedents of conv2 layer">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-preced2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/att_00069.png" class="img-fluid figure-img" alt="Secondary precedents of conv2 layer" width="601">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-preced2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;13.11: Secondary precedents of Conv2 layer
+</figcaption>
+</figure>
+</div>
+<p>In this example, we have just two convolutional layers, each of stride 2, so this is now tracing right back to the input image. We can see that a 7×7 area of cells in the input layer is used to calculate the single green cell in the Conv2 layer. This 7×7 area is the <em>receptive field</em> in the input of the green activation in Conv2. We can also see that a second filter kernel is needed now, since we have two layers.</p>
+<p>As you see from this example, the deeper we are in the network (specifically, the more stride-2 convs we have before a layer), the larger the receptive field for an activation in that layer. A large receptive field means that a large amount of the input image is used to calculate each activation in that layer is. We now know that in the deeper layers of the network we have semantically rich features, corresponding to larger receptive fields. Therefore, we’d expect that we’d need more weights for each of our features to handle this increasing complexity. This is another way of saying the same thing we mentioned in the previous section: when we introduce a stride-2 conv in our network, we should also increase the number of channels.</p>
+<p>When writing this particular chapter, we had a lot of questions we needed answers for, to be able to explain CNNs to you as best we could. Believe it or not, we found most of the answers on Twitter. We’re going to take a quick break to talk to you about that now, before we move on to color images.</p>
+</section>
+<section id="a-note-about-twitter" class="level3">
+<h3 class="anchored" data-anchor-id="a-note-about-twitter">A Note About Twitter</h3>
+<p>We are not, to say the least, big users of social networks in general. But our goal in writing this book is to help you become the best deep learning practitioner you can, and we would be remiss not to mention how important Twitter has been in our own deep learning journeys.</p>
+<p>You see, there’s another part of Twitter, far away from Donald Trump and the Kardashians, which is the part of Twitter where deep learning researchers and practitioners talk shop every day. As we were writing this section, Jeremy wanted to double-check that what we were saying about stride-2 convolutions was accurate, so he asked on Twitter:</p>
+<p><img src="images/att_00064.png" class="img-fluid" alt="twitter 1" width="500"></p>
+<p>A few minutes later, this answer popped up:</p>
+<p><img src="images/att_00065.png" class="img-fluid" alt="twitter 2" width="500"></p>
+<p>Christian Szegedy is the first author of <a href="https://arxiv.org/pdf/1409.4842.pdf">Inception</a>, the 2014 ImageNet winner and source of many key insights used in modern neural networks. Two hours later, this appeared:</p>
+<p><img src="images/att_00066.png" class="img-fluid" alt="twitter 3" width="500"></p>
+<p>Do you recognize that name? You saw it in <a href="book2.html" class="quarto-xref"><span>Chapter 2</span></a>, when we were talking about the Turing Award winners who established the foundations of deep learning today!</p>
+<p>Jeremy also asked on Twitter for help checking our description of label smoothing in <a href="book7.html" class="quarto-xref"><span>Chapter 7</span></a> was accurate, and got a response again from directly from Christian Szegedy (label smoothing was originally introduced in the Inception paper):</p>
+<p><img src="images/att_00067.png" class="img-fluid" alt="twitter 4" width="500"></p>
+<p>Many of the top people in deep learning today are Twitter regulars, and are very open about interacting with the wider community. One good way to get started is to look at a list of Jeremy’s <a href="https://twitter.com/jeremyphoward/likes">recent Twitter likes</a>, or <a href="https://twitter.com/GuggerSylvain/likes">Sylvain’s</a>. That way, you can see a list of Twitter users that we think have interesting and useful things to say.</p>
+<p>Twitter is the main way we both stay up to date with interesting papers, software releases, and other deep learning news. For making connections with the deep learning community, we recommend getting involved both in the <a href="https://forums.fast.ai">fast.ai forums</a> and on Twitter.</p>
+<p>That said, let’s get back to the meat of this chapter. Up until now, we have only shown you examples of pictures in black and white, with one value per pixel. In practice, most colored images have three values per pixel to define their color. We’ll look at working with color images next.</p>
+</section>
+</section>
+<section id="color-images" class="level2" data-number="13.3">
+<h2 data-number="13.3" class="anchored" data-anchor-id="color-images"><span class="header-section-number">13.3</span> Color Images</h2>
+<p>A colour picture is a rank-3 tensor:</p>
+<div id="cell-140" class="cell">
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>im <span class="op">=</span> image2tensor(Image.<span class="bu">open</span>(image_bear()))</span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>im.shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>torch.Size([3, 1000, 846])</code></pre>
+</div>
+</div>
+<div id="cell-141" class="cell">
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>show_image(im)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="convolutions_files/figure-html/cell-39-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The first axis contains the channels, red, green, and blue:</p>
+<div id="cell-143" class="cell">
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a>_,axs <span class="op">=</span> subplots(<span class="dv">1</span>,<span class="dv">3</span>)</span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> bear,ax,color <span class="kw">in</span> <span class="bu">zip</span>(im,axs,(<span class="st">'Reds'</span>,<span class="st">'Greens'</span>,<span class="st">'Blues'</span>)):</span>
+<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a>    show_image(<span class="dv">255</span><span class="op">-</span>bear, ax<span class="op">=</span>ax, cmap<span class="op">=</span>color)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="convolutions_files/figure-html/cell-40-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>We saw what the convolution operation was for one filter on one channel of the image (our examples were done on a square). A convolutional layer will take an image with a certain number of channels (three for the first layer for regular RGB color images) and output an image with a different number of channels. Like our hidden size that represented the numbers of neurons in a linear layer, we can decide to have as many filters as we want, and each of them will be able to specialize, some to detect horizontal edges, others to detect vertical edges and so forth, to give something like we studied in <a href="book2.html" class="quarto-xref"><span>Chapter 2</span></a>.</p>
+<p>In one sliding window, we have a certain number of channels and we need as many filters (we don’t use the same kernel for all the channels). So our kernel doesn’t have a size of 3 by 3, but <code>ch_in</code> (for channels in) is 3 by 3. On each channel, we multiply the elements of our window by the elements of the coresponding filter, then sum the results (as we saw before) and sum over all the filters. In the example given in <a href="#fig-rgbconv" class="quarto-xref">Figure&nbsp;<span>13.12</span></a>, the result of our conv layer on that window is red + green + blue.</p>
+<div id="fig-rgbconv" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Convolution over an RGB image">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-rgbconv-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/chapter9_rgbconv.svg" class="img-fluid figure-img" alt="Convolution over an RGB image" width="550">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-rgbconv-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;13.12: Convolution over an RGB image
+</figcaption>
+</figure>
+</div>
+<p>So, in order to apply a convolution to a color picture we require a kernel tensor with a size that matches the first axis. At each location, the corresponding parts of the kernel and the image patch are multiplied together.</p>
+<p>These are then all added together, to produce a single number, for each grid location, for each output feature, as shown in <a href="#fig-rgbconv2" class="quarto-xref">Figure&nbsp;<span>13.13</span></a>.</p>
+<div id="fig-rgbconv2" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Adding the RGB filters">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-rgbconv2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/chapter9_rgb_conv_stack.svg" class="img-fluid figure-img" alt="Adding the RGB filters" width="500">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-rgbconv2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;13.13: Adding the RGB filters
+</figcaption>
+</figure>
+</div>
+<p>Then we have <code>ch_out</code> filters like this, so in the end, the result of our convolutional layer will be a batch of images with <code>ch_out</code> channels and a height and width given by the formula outlined earlier. This give us <code>ch_out</code> tensors of size <code>ch_in x ks x ks</code> that we represent in one big tensor of four dimensions. In PyTorch, the order of the dimensions for those weights is <code>ch_out x ch_in x ks x ks</code>.</p>
+<p>Additionally, we may want to have a bias for each filter. In the preceding example, the final result for our convolutional layer would be <span class="math inline">\(y_{R} + y_{G} + y_{B} + b\)</span> in that case. Like in a linear layer, there are as many bias as we have kernels, so the biases is a vector of size <code>ch_out</code>.</p>
+<p>There are no special mechanisms required when setting up a CNN for training with color images. Just make sure your first layer has three inputs.</p>
+<p>There are lots of ways of processing color images. For instance, you can change them to black and white, change from RGB to HSV (hue, saturation, and value) color space, and so forth. In general, it turns out experimentally that changing the encoding of colors won’t make any difference to your model results, as long as you don’t lose information in the transformation. So, transforming to black and white is a bad idea, since it removes the color information entirely (and this can be critical; for instance, a pet breed may have a distinctive color); but converting to HSV generally won’t make any difference.</p>
+<p>Now you know what those pictures in <a href="intro.html" class="quarto-xref"><span>Chapter 1</span></a> of “what a neural net learns” from the <a href="https://arxiv.org/abs/1311.2901">Zeiler and Fergus paper</a> mean! This is their picture of some of the layer 1 weights which we showed:</p>
+<p><img src="images/att_00031.png" class="img-fluid" alt="Layer 1 kernels found by Zeiler and Fergus" width="120"></p>
+<p>This is taking the three slices of the convolutional kernel, for each output feature, and displaying them as images. We can see that even though the creators of the neural net never explicitly created kernels to find edges, for instance, the neural net automatically discovered these features using SGD.</p>
+<p>Now let’s see how we can train these CNNs, and show you all the techniques fastai uses under the hood for efficient training.</p>
+</section>
+<section id="improving-training-stability" class="level2" data-number="13.4">
+<h2 data-number="13.4" class="anchored" data-anchor-id="improving-training-stability"><span class="header-section-number">13.4</span> Improving Training Stability</h2>
+<p>Since we are so good at recognizing 3s from 7s, let’s move on to something harder—recognizing all 10 digits. That means we’ll need to use <code>MNIST</code> instead of <code>MNIST_SAMPLE</code>:</p>
+<div id="cell-153" class="cell">
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a>path <span class="op">=</span> untar_data(URLs.MNIST)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-155" class="cell">
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a>path.ls()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>(#2) [Path('testing'),Path('training')]</code></pre>
+</div>
+</div>
+<p>The data is in two folders named <em>training</em> and <em>testing</em>, so we have to tell <code>GrandparentSplitter</code> about that (it defaults to <code>train</code> and <code>valid</code>). We did do that in the <code>get_dls</code> function, which we create to make it easy to change our batch size later:</p>
+<div id="cell-157" class="cell">
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_dls(bs<span class="op">=</span><span class="dv">64</span>):</span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> DataBlock(</span>
+<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a>        blocks<span class="op">=</span>(ImageBlock(cls<span class="op">=</span>PILImageBW), CategoryBlock), </span>
+<span id="cb58-4"><a href="#cb58-4" aria-hidden="true" tabindex="-1"></a>        get_items<span class="op">=</span>get_image_files, </span>
+<span id="cb58-5"><a href="#cb58-5" aria-hidden="true" tabindex="-1"></a>        splitter<span class="op">=</span>GrandparentSplitter(<span class="st">'training'</span>,<span class="st">'testing'</span>),</span>
+<span id="cb58-6"><a href="#cb58-6" aria-hidden="true" tabindex="-1"></a>        get_y<span class="op">=</span>parent_label,</span>
+<span id="cb58-7"><a href="#cb58-7" aria-hidden="true" tabindex="-1"></a>        batch_tfms<span class="op">=</span>Normalize()</span>
+<span id="cb58-8"><a href="#cb58-8" aria-hidden="true" tabindex="-1"></a>    ).dataloaders(path, bs<span class="op">=</span>bs)</span>
+<span id="cb58-9"><a href="#cb58-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb58-10"><a href="#cb58-10" aria-hidden="true" tabindex="-1"></a>dls <span class="op">=</span> get_dls()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Remember, it’s always a good idea to look at your data before you use it:</p>
+<div id="cell-159" class="cell">
+<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a>dls.show_batch(max_n<span class="op">=</span><span class="dv">9</span>, figsize<span class="op">=</span>(<span class="dv">4</span>,<span class="dv">4</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="convolutions_files/figure-html/cell-45-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Now that we have our data ready, we can train a simple model on it.</p>
+<section id="a-simple-baseline" class="level3">
+<h3 class="anchored" data-anchor-id="a-simple-baseline">A Simple Baseline</h3>
+<p>Earlier in this chapter, we built a model based on a <code>conv</code> function like this:</p>
+<div id="cell-163" class="cell">
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> conv(ni, nf, ks<span class="op">=</span><span class="dv">3</span>, act<span class="op">=</span><span class="va">True</span>):</span>
+<span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a>    res <span class="op">=</span> nn.Conv2d(ni, nf, stride<span class="op">=</span><span class="dv">2</span>, kernel_size<span class="op">=</span>ks, padding<span class="op">=</span>ks<span class="op">//</span><span class="dv">2</span>)</span>
+<span id="cb60-3"><a href="#cb60-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> act: res <span class="op">=</span> nn.Sequential(res, nn.ReLU())</span>
+<span id="cb60-4"><a href="#cb60-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> res</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Let’s start with a basic CNN as a baseline. We’ll use the same one as earlier, but with one tweak: we’ll use more activations. Since we have more numbers to differentiate, it’s likely we will need to learn more filters.</p>
+<p>As we discussed, we generally want to double the number of filters each time we have a stride-2 layer. One way to increase the number of filters throughout our network is to double the number of activations in the first layer–then every layer after that will end up twice as big as in the previous version as well.</p>
+<p>But there is a subtle problem with this. Consider the kernel that is being applied to each pixel. By default, we use a 3×3-pixel kernel. That means that there are a total of 3×3 = 9 pixels that the kernel is being applied to at each location. Previously, our first layer had four output filters. That meant that there were four values being computed from nine pixels at each location. Think about what happens if we double this output to eight filters. Then when we apply our kernel we will be using nine pixels to calculate eight numbers. That means it isn’t really learning much at all: the output size is almost the same as the input size. Neural networks will only create useful features if they’re forced to do so—that is, if the number of outputs from an operation is significantly smaller than the number of inputs.</p>
+<p>To fix this, we can use a larger kernel in the first layer. If we use a kernel of 5×5 pixels then there are 25 pixels being used at each kernel application. Creating eight filters from this will mean the neural net will have to find some useful features:</p>
+<div id="cell-165" class="cell">
+<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> simple_cnn():</span>
+<span id="cb61-2"><a href="#cb61-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> sequential(</span>
+<span id="cb61-3"><a href="#cb61-3" aria-hidden="true" tabindex="-1"></a>        conv(<span class="dv">1</span> ,<span class="dv">8</span>, ks<span class="op">=</span><span class="dv">5</span>),        <span class="co">#14x14</span></span>
+<span id="cb61-4"><a href="#cb61-4" aria-hidden="true" tabindex="-1"></a>        conv(<span class="dv">8</span> ,<span class="dv">16</span>),             <span class="co">#7x7</span></span>
+<span id="cb61-5"><a href="#cb61-5" aria-hidden="true" tabindex="-1"></a>        conv(<span class="dv">16</span>,<span class="dv">32</span>),             <span class="co">#4x4</span></span>
+<span id="cb61-6"><a href="#cb61-6" aria-hidden="true" tabindex="-1"></a>        conv(<span class="dv">32</span>,<span class="dv">64</span>),             <span class="co">#2x2</span></span>
+<span id="cb61-7"><a href="#cb61-7" aria-hidden="true" tabindex="-1"></a>        conv(<span class="dv">64</span>,<span class="dv">10</span>, act<span class="op">=</span><span class="va">False</span>),  <span class="co">#1x1</span></span>
+<span id="cb61-8"><a href="#cb61-8" aria-hidden="true" tabindex="-1"></a>        Flatten(),</span>
+<span id="cb61-9"><a href="#cb61-9" aria-hidden="true" tabindex="-1"></a>    )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>As you’ll see in a moment, we can look inside our models while they’re training in order to try to find ways to make them train better. To do this we use the <code>ActivationStats</code> callback, which records the mean, standard deviation, and histogram of activations of every trainable layer (as we’ve seen, callbacks are used to add behavior to the training loop; we’ll explore how they work in <a href="accel_sgd.html" class="quarto-xref"><span>Chapter 16</span></a>):</p>
+<div id="cell-167" class="cell">
+<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> fastai.callback.hook <span class="im">import</span> <span class="op">*</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We want to train quickly, so that means training at a high learning rate. Let’s see how we go at 0.06:</p>
+<div id="cell-169" class="cell">
+<div class="sourceCode cell-code" id="cb63"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> fit(epochs<span class="op">=</span><span class="dv">1</span>):</span>
+<span id="cb63-2"><a href="#cb63-2" aria-hidden="true" tabindex="-1"></a>    learn <span class="op">=</span> Learner(dls, simple_cnn(), loss_func<span class="op">=</span>F.cross_entropy,</span>
+<span id="cb63-3"><a href="#cb63-3" aria-hidden="true" tabindex="-1"></a>                    metrics<span class="op">=</span>accuracy, cbs<span class="op">=</span>ActivationStats(with_hist<span class="op">=</span><span class="va">True</span>))</span>
+<span id="cb63-4"><a href="#cb63-4" aria-hidden="true" tabindex="-1"></a>    learn.fit(epochs, <span class="fl">0.06</span>)</span>
+<span id="cb63-5"><a href="#cb63-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> learn</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-170" class="cell">
+<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a>learn <span class="op">=</span> fit()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">epoch</th>
+<th data-quarto-table-cell-role="th">train_loss</th>
+<th data-quarto-table-cell-role="th">valid_loss</th>
+<th data-quarto-table-cell-role="th">accuracy</th>
+<th data-quarto-table-cell-role="th">time</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0</td>
+<td>2.307071</td>
+<td>2.305865</td>
+<td>0.113500</td>
+<td>00:16</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>This didn’t train at all well! Let’s find out why.</p>
+<p>One handy feature of the callbacks passed to <code>Learner</code> is that they are made available automatically, with the same name as the callback class, except in <code>snake_case</code>. So, our <code>ActivationStats</code> callback can be accessed through <code>activation_stats</code>. I’m sure you remember <code>learn.recorder</code>… can you guess how that is implemented? That’s right, it’s a callback called <code>Recorder</code>!</p>
+<p><code>ActivationStats</code> includes some handy utilities for plotting the activations during training. <code>plot_layer_stats(idx)</code> plots the mean and standard deviation of the activations of layer number <em><code>idx</code></em>, along with the percentage of activations near zero. Here’s the first layer’s plot:</p>
+<div id="cell-172" class="cell">
+<div class="sourceCode cell-code" id="cb65"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a>learn.activation_stats.plot_layer_stats(<span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="convolutions_files/figure-html/cell-51-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Generally our model should have a consistent, or at least smooth, mean and standard deviation of layer activations during training. Activations near zero are particularly problematic, because it means we have computation in the model that’s doing nothing at all (since multiplying by zero gives zero). When you have some zeros in one layer, they will therefore generally carry over to the next layer… which will then create more zeros. Here’s the penultimate layer of our network:</p>
+<div id="cell-174" class="cell">
+<div class="sourceCode cell-code" id="cb66"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a>learn.activation_stats.plot_layer_stats(<span class="op">-</span><span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="convolutions_files/figure-html/cell-52-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>As expected, the problems get worse towards the end of the network, as the instability and zero activations compound over layers. Let’s look at what we can do to make training more stable.</p>
+</section>
+<section id="increase-batch-size" class="level3">
+<h3 class="anchored" data-anchor-id="increase-batch-size">Increase Batch Size</h3>
+<p>One way to make training more stable is to increase the batch size. Larger batches have gradients that are more accurate, since they’re calculated from more data. On the downside, though, a larger batch size means fewer batches per epoch, which means less opportunities for your model to update weights. Let’s see if a batch size of 512 helps:</p>
+<div id="cell-178" class="cell">
+<div class="sourceCode cell-code" id="cb67"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a>dls <span class="op">=</span> get_dls(<span class="dv">512</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-179" class="cell">
+<div class="sourceCode cell-code" id="cb68"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a>learn <span class="op">=</span> fit()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">epoch</th>
+<th data-quarto-table-cell-role="th">train_loss</th>
+<th data-quarto-table-cell-role="th">valid_loss</th>
+<th data-quarto-table-cell-role="th">accuracy</th>
+<th data-quarto-table-cell-role="th">time</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0</td>
+<td>2.309385</td>
+<td>2.302744</td>
+<td>0.113500</td>
+<td>00:08</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Let’s see what the penultimate layer looks like:</p>
+<div id="cell-181" class="cell">
+<div class="sourceCode cell-code" id="cb69"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a>learn.activation_stats.plot_layer_stats(<span class="op">-</span><span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="convolutions_files/figure-html/cell-55-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Again, we’ve got most of our activations near zero. Let’s see what else we can do to improve training stability.</p>
+</section>
+<section id="cycle-training" class="level3">
+<h3 class="anchored" data-anchor-id="cycle-training">1cycle Training</h3>
+<p>Our initial weights are not well suited to the task we’re trying to solve. Therefore, it is dangerous to begin training with a high learning rate: we may very well make the training diverge instantly, as we’ve seen. We probably don’t want to end training with a high learning rate either, so that we don’t skip over a minimum. But we want to train at a high learning rate for the rest of the training period, because we’ll be able to train more quickly that way. Therefore, we should change the learning rate during training, from low, to high, and then back to low again.</p>
+<p>Leslie Smith (yes, the same guy that invented the learning rate finder!) developed this idea in his article <a href="https://arxiv.org/abs/1708.07120">“Super-Convergence: Very Fast Training of Neural Networks Using Large Learning Rates”</a>. He designed a schedule for learning rate separated into two phases: one where the learning rate grows from the minimum value to the maximum value (<em>warmup</em>), and one where it decreases back to the minimum value (<em>annealing</em>). Smith called this combination of approaches <em>1cycle training</em>.</p>
+<p>1cycle training allows us to use a much higher maximum learning rate than other types of training, which gives two benefits:</p>
+<ul>
+<li>By training with higher learning rates, we train faster—a phenomenon Smith named <em>super-convergence</em>.</li>
+<li>By training with higher learning rates, we overfit less because we skip over the sharp local minima to end up in a smoother (and therefore more generalizable) part of the loss.</li>
+</ul>
+<p>The second point is an interesting and subtle one; it is based on the observation that a model that generalizes well is one whose loss would not change very much if you changed the input by a small amount. If a model trains at a large learning rate for quite a while, and can find a good loss when doing so, it must have found an area that also generalizes well, because it is jumping around a lot from batch to batch (that is basically the definition of a high learning rate). The problem is that, as we have discussed, just jumping to a high learning rate is more likely to result in diverging losses, rather than seeing your losses improve. So we don’t jump straight to a high learning rate. Instead, we start at a low learning rate, where our losses do not diverge, and we allow the optimizer to gradually find smoother and smoother areas of our parameters by gradually going to higher and higher learning rates.</p>
+<p>Then, once we have found a nice smooth area for our parameters, we want to find the very best part of that area, which means we have to bring our learning rates down again. This is why 1cycle training has a gradual learning rate warmup, and a gradual learning rate cooldown. Many researchers have found that in practice this approach leads to more accurate models and trains more quickly. That is why it is the approach that is used by default for <code>fine_tune</code> in fastai.</p>
+<p>In <a href="accel_sgd.html" class="quarto-xref"><span>Chapter 16</span></a> we’ll learn all about <em>momentum</em> in SGD. Briefly, momentum is a technique where the optimizer takes a step not only in the direction of the gradients, but also that continues in the direction of previous steps. Leslie Smith introduced the idea of <em>cyclical momentums</em> in <a href="https://arxiv.org/pdf/1803.09820.pdf">“A Disciplined Approach to Neural Network Hyper-Parameters: Part 1”</a>. It suggests that the momentum varies in the opposite direction of the learning rate: when we are at high learning rates, we use less momentum, and we use more again in the annealing phase.</p>
+<p>We can use 1cycle training in fastai by calling <code>fit_one_cycle</code>:</p>
+<div id="cell-185" class="cell">
+<div class="sourceCode cell-code" id="cb70"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> fit(epochs<span class="op">=</span><span class="dv">1</span>, lr<span class="op">=</span><span class="fl">0.06</span>):</span>
+<span id="cb70-2"><a href="#cb70-2" aria-hidden="true" tabindex="-1"></a>    learn <span class="op">=</span> Learner(dls, simple_cnn(), loss_func<span class="op">=</span>F.cross_entropy,</span>
+<span id="cb70-3"><a href="#cb70-3" aria-hidden="true" tabindex="-1"></a>                    metrics<span class="op">=</span>accuracy, cbs<span class="op">=</span>ActivationStats(with_hist<span class="op">=</span><span class="va">True</span>))</span>
+<span id="cb70-4"><a href="#cb70-4" aria-hidden="true" tabindex="-1"></a>    learn.fit_one_cycle(epochs, lr)</span>
+<span id="cb70-5"><a href="#cb70-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> learn</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-186" class="cell">
+<div class="sourceCode cell-code" id="cb71"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a>learn <span class="op">=</span> fit()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">epoch</th>
+<th data-quarto-table-cell-role="th">train_loss</th>
+<th data-quarto-table-cell-role="th">valid_loss</th>
+<th data-quarto-table-cell-role="th">accuracy</th>
+<th data-quarto-table-cell-role="th">time</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0</td>
+<td>0.210838</td>
+<td>0.084827</td>
+<td>0.974300</td>
+<td>00:08</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>We’re finally making some progress! It’s giving us a reasonable accuracy now.</p>
+<p>We can view the learning rate and momentum throughout training by calling <code>plot_sched</code> on <code>learn.recorder</code>. <code>learn.recorder</code> (as the name suggests) records everything that happens during training, including losses, metrics, and hyperparameters such as learning rate and momentum:</p>
+<div id="cell-188" class="cell">
+<div class="sourceCode cell-code" id="cb72"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a>learn.recorder.plot_sched()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="convolutions_files/figure-html/cell-58-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Smith’s original 1cycle paper used a linear warmup and linear annealing. As you can see, we adapted the approach in fastai by combining it with another popular approach: cosine annealing. <code>fit_one_cycle</code> provides the following parameters you can adjust:</p>
+<ul>
+<li><code>lr_max</code>:: The highest learning rate that will be used (this can also be a list of learning rates for each layer group, or a Python <code>slice</code> object containing the first and last layer group learning rates)</li>
+<li><code>div</code>:: How much to divide <code>lr_max</code> by to get the starting learning rate</li>
+<li><code>div_final</code>:: How much to divide <code>lr_max</code> by to get the ending learning rate</li>
+<li><code>pct_start</code>:: What percentage of the batches to use for the warmup</li>
+<li><code>moms</code>:: A tuple <code>(mom1,mom2,mom3)</code> where <em><code>mom1</code></em> is the initial momentum, <em><code>mom2</code></em> is the minimum momentum, and <em><code>mom3</code></em> is the final momentum</li>
+</ul>
+<p>Let’s take a look at our layer stats again:</p>
+<div id="cell-190" class="cell">
+<div class="sourceCode cell-code" id="cb73"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a>learn.activation_stats.plot_layer_stats(<span class="op">-</span><span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="convolutions_files/figure-html/cell-59-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The percentage of near-zero weights is getting much better, although it’s still quite high.</p>
+<p>We can see even more about what’s going on in our training using <code>color_dim</code>, passing it a layer index:</p>
+<div id="cell-192" class="cell">
+<div class="sourceCode cell-code" id="cb74"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a>learn.activation_stats.color_dim(<span class="op">-</span><span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="convolutions_files/figure-html/cell-60-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><code>color_dim</code> was developed by fast.ai in conjunction with a student, Stefano Giomo. Stefano, who refers to the idea as the <em>colorful dimension</em>, provides an <a href="https://forums.fast.ai/t/the-colorful-dimension/42908">in-depth explanation</a> of the history and details behind the method. The basic idea is to create a histogram of the activations of a layer, which we would hope would follow a smooth pattern such as the normal distribution (colorful_dist).</p>
+<div id="fig-colorful-dist" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Histogram in 'colorful dimension'">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-colorful-dist-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/colorful_dist.jpeg" class="img-fluid figure-img" alt="Histogram in 'colorful dimension'" width="800">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-colorful-dist-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;13.14: Histogram in ‘colorful dimension’
+</figcaption>
+</figure>
+</div>
+<p>To create <code>color_dim</code>, we take the histogram shown on the left here, and convert it into just the colored representation shown at the bottom. Then we flip it on its side, as shown on the right. We found that the distribution is clearer if we take the log of the histogram values. Then, Stefano describes:</p>
+<blockquote class="blockquote">
+<p>The final plot for each layer is made by stacking the histogram of the activations from each batch along the horizontal axis. So each vertical slice in the visualisation represents the histogram of activations for a single batch. The color intensity corresponds to the height of the histogram, in other words the number of activations in each histogram bin.</p>
+</blockquote>
+<p><a href="#fig-colorful-summ" class="quarto-xref">Figure&nbsp;<span>13.15</span></a> shows how this all fits together.</p>
+<div id="fig-colorful-summ" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Summary of the colorful dimension">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-colorful-summ-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/colorful_summ.png" class="img-fluid figure-img" alt="Summary of the colorful dimension" width="800">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-colorful-summ-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;13.15: Summary of the colorful dimension (courtesy of Stefano Giomo)
+</figcaption>
+</figure>
+</div>
+<p>This illustrates why log(f) is more colorful than <em>f</em> when <em>f</em> follows a normal distribution because taking a log changes the Gaussian in a quadratic, which isn’t as narrow.</p>
+<p>So with that in mind, let’s take another look at the result for the penultimate layer:</p>
+<div id="cell-199" class="cell">
+<div class="sourceCode cell-code" id="cb75"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a>learn.activation_stats.color_dim(<span class="op">-</span><span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="convolutions_files/figure-html/cell-61-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>This shows a classic picture of “bad training.” We start with nearly all activations at zero—that’s what we see at the far left, with all the dark blue. The bright yellow at the bottom represents the near-zero activations. Then, over the first few batches we see the number of nonzero activations exponentially increasing. But it goes too far, and collapses! We see the dark blue return, and the bottom becomes bright yellow again. It almost looks like training restarts from scratch. Then we see the activations increase again, and collapse again. After repeating this a few times, eventually we see a spread of activations throughout the range.</p>
+<p>It’s much better if training can be smooth from the start. The cycles of exponential increase and then collapse tend to result in a lot of near-zero activations, resulting in slow training and poor final results. One way to solve this problem is to use batch normalization.</p>
+</section>
+<section id="batch-normalization" class="level3">
+<h3 class="anchored" data-anchor-id="batch-normalization">Batch Normalization</h3>
+<p>To fix the slow training and poor final results we ended up with in the previous section, we need to fix the initial large percentage of near-zero activations, and then try to maintain a good distribution of activations throughout training.</p>
+<p>Sergey Ioffe and Christian Szegedy presented a solution to this problem in the 2015 paper <a href="https://arxiv.org/abs/1502.03167">“Batch Normalization: Accelerating Deep Network Training by Reducing Internal Covariate Shift”</a>. In the abstract, they describe just the problem that we’ve seen:</p>
+<blockquote class="blockquote">
+<p>Training Deep Neural Networks is complicated by the fact that the distribution of each layer’s inputs changes during training, as the parameters of the previous layers change. This slows down the training by requiring lower learning rates and careful parameter initialization… We refer to this phenomenon as internal covariate shift, and address the problem by normalizing layer inputs.</p>
+</blockquote>
+<p>Their solution, they say is:</p>
+<blockquote class="blockquote">
+<p>Making normalization a part of the model architecture and performing the normalization for each training mini-batch. Batch Normalization allows us to use much higher learning rates and be less careful about initialization.</p>
+</blockquote>
+<p>The paper caused great excitement as soon as it was released, because it included the chart in <a href="#fig-batchnorm" class="quarto-xref">Figure&nbsp;<span>13.16</span></a>, which clearly demonstrated that batch normalization could train a model that was even more accurate than the current state of the art (the <em>Inception</em> architecture) and around 5x faster.</p>
+<div id="fig-batchnorm" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Impact of batch normalization">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-batchnorm-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/att_00046.png" class="img-fluid figure-img" alt="Impact of batch normalization" width="553">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-batchnorm-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;13.16: Impact of batch normalization (courtesy of Sergey Ioffe and Christian Szegedy)
+</figcaption>
+</figure>
+</div>
+<p>Batch normalization (often just called <em>batchnorm</em>) works by taking an average of the mean and standard deviations of the activations of a layer and using those to normalize the activations. However, this can cause problems because the network might want some activations to be really high in order to make accurate predictions. So they also added two learnable parameters (meaning they will be updated in the SGD step), usually called <code>gamma</code> and <code>beta</code>. After normalizing the activations to get some new activation vector <code>y</code>, a batchnorm layer returns <code>gamma*y + beta</code>.</p>
+<p>That’s why our activations can have any mean or variance, independent from the mean and standard deviation of the results of the previous layer. Those statistics are learned separately, making training easier on our model. The behavior is different during training and validation: during training, we use the mean and standard deviation of the batch to normalize the data, while during validation we instead use a running mean of the statistics calculated during training.</p>
+<p>Let’s add a batchnorm layer to <code>conv</code>:</p>
+<div id="cell-205" class="cell">
+<div class="sourceCode cell-code" id="cb76"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> conv(ni, nf, ks<span class="op">=</span><span class="dv">3</span>, act<span class="op">=</span><span class="va">True</span>):</span>
+<span id="cb76-2"><a href="#cb76-2" aria-hidden="true" tabindex="-1"></a>    layers <span class="op">=</span> [nn.Conv2d(ni, nf, stride<span class="op">=</span><span class="dv">2</span>, kernel_size<span class="op">=</span>ks, padding<span class="op">=</span>ks<span class="op">//</span><span class="dv">2</span>)]</span>
+<span id="cb76-3"><a href="#cb76-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> act: layers.append(nn.ReLU())</span>
+<span id="cb76-4"><a href="#cb76-4" aria-hidden="true" tabindex="-1"></a>    layers.append(nn.BatchNorm2d(nf))</span>
+<span id="cb76-5"><a href="#cb76-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> nn.Sequential(<span class="op">*</span>layers)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>and fit our model:</p>
+<div id="cell-207" class="cell">
+<div class="sourceCode cell-code" id="cb77"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb77-1"><a href="#cb77-1" aria-hidden="true" tabindex="-1"></a>learn <span class="op">=</span> fit()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">epoch</th>
+<th data-quarto-table-cell-role="th">train_loss</th>
+<th data-quarto-table-cell-role="th">valid_loss</th>
+<th data-quarto-table-cell-role="th">accuracy</th>
+<th data-quarto-table-cell-role="th">time</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0</td>
+<td>0.130036</td>
+<td>0.055021</td>
+<td>0.986400</td>
+<td>00:10</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>That’s a great result! Let’s take a look at <code>color_dim</code>:</p>
+<div id="cell-209" class="cell">
+<div class="sourceCode cell-code" id="cb78"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a>learn.activation_stats.color_dim(<span class="op">-</span><span class="dv">4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="convolutions_files/figure-html/cell-64-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>This is just what we hope to see: a smooth development of activations, with no “crashes.” Batchnorm has really delivered on its promise here! In fact, batchnorm has been so successful that we see it (or something very similar) in nearly all modern neural networks.</p>
+<p>An interesting observation about models containing batch normalization layers is that they tend to generalize better than models that don’t contain them. Although we haven’t as yet seen a rigorous analysis of what’s going on here, most researchers believe that the reason for this is that batch normalization adds some extra randomness to the training process. Each mini-batch will have a somewhat different mean and standard deviation than other mini-batches. Therefore, the activations will be normalized by different values each time. In order for the model to make accurate predictions, it will have to learn to become robust to these variations. In general, adding additional randomization to the training process often helps.</p>
+<p>Since things are going so well, let’s train for a few more epochs and see how it goes. In fact, let’s <em>increase</em> the learning rate, since the abstract of the batchnorm paper claimed we should be able to “train at much higher learning rates”:</p>
+<div id="cell-211" class="cell">
+<div class="sourceCode cell-code" id="cb79"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb79-1"><a href="#cb79-1" aria-hidden="true" tabindex="-1"></a>learn <span class="op">=</span> fit(<span class="dv">5</span>, lr<span class="op">=</span><span class="fl">0.1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">epoch</th>
+<th data-quarto-table-cell-role="th">train_loss</th>
+<th data-quarto-table-cell-role="th">valid_loss</th>
+<th data-quarto-table-cell-role="th">accuracy</th>
+<th data-quarto-table-cell-role="th">time</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0</td>
+<td>0.191731</td>
+<td>0.121738</td>
+<td>0.960900</td>
+<td>00:11</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>0.083739</td>
+<td>0.055808</td>
+<td>0.981800</td>
+<td>00:10</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>0.053161</td>
+<td>0.044485</td>
+<td>0.987100</td>
+<td>00:10</td>
+</tr>
+<tr class="even">
+<td>3</td>
+<td>0.034433</td>
+<td>0.030233</td>
+<td>0.990200</td>
+<td>00:10</td>
+</tr>
+<tr class="odd">
+<td>4</td>
+<td>0.017646</td>
+<td>0.025407</td>
+<td>0.991200</td>
+<td>00:10</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>At this point, I think it’s fair to say we know how to recognize digits! It’s time to move on to something harder…</p>
+</section>
+</section>
+<section id="conclusions" class="level2" data-number="13.5">
+<h2 data-number="13.5" class="anchored" data-anchor-id="conclusions"><span class="header-section-number">13.5</span> Conclusions</h2>
+<p>We’ve seen that convolutions are just a type of matrix multiplication, with two constraints on the weight matrix: some elements are always zero, and some elements are tied (forced to always have the same value). In <a href="intro.html" class="quarto-xref"><span>Chapter 1</span></a> we saw the eight requirements from the 1986 book <em>Parallel Distributed Processing</em>; one of them was “A pattern of connectivity among units.” That’s exactly what these constraints do: they enforce a certain pattern of connectivity.</p>
+<p>These constraints allow us to use far fewer parameters in our model, without sacrificing the ability to represent complex visual features. That means we can train deeper models faster, with less overfitting. Although the universal approximation theorem shows that it should be <em>possible</em> to represent anything in a fully connected network in one hidden layer, we’ve seen now that in <em>practice</em> we can train much better models by being thoughtful about network architecture.</p>
+<p>Convolutions are by far the most common pattern of connectivity we see in neural nets (along with regular linear layers, which we refer to as <em>fully connected</em>), but it’s likely that many more will be discovered.</p>
+<p>We’ve also seen how to interpret the activations of layers in the network to see whether training is going well or not, and how batchnorm helps regularize the training and makes it smoother. In the next chapter, we will use both of those layers to build the most popular architecture in computer vision: a residual network.</p>
+</section>
+<section id="questionnaire" class="level2" data-number="13.6">
+<h2 data-number="13.6" class="anchored" data-anchor-id="questionnaire"><span class="header-section-number">13.6</span> Questionnaire</h2>
+<ol type="1">
+<li>What is a “feature”?</li>
+<li>Write out the convolutional kernel matrix for a top edge detector.</li>
+<li>Write out the mathematical operation applied by a 3×3 kernel to a single pixel in an image.</li>
+<li>What is the value of a convolutional kernel apply to a 3×3 matrix of zeros?</li>
+<li>What is “padding”?</li>
+<li>What is “stride”?</li>
+<li>Create a nested list comprehension to complete any task that you choose.</li>
+<li>What are the shapes of the <code>input</code> and <code>weight</code> parameters to PyTorch’s 2D convolution?</li>
+<li>What is a “channel”?</li>
+<li>What is the relationship between a convolution and a matrix multiplication?</li>
+<li>What is a “convolutional neural network”?</li>
+<li>What is the benefit of refactoring parts of your neural network definition?</li>
+<li>What is <code>Flatten</code>? Where does it need to be included in the MNIST CNN? Why?</li>
+<li>What does “NCHW” mean?</li>
+<li>Why does the third layer of the MNIST CNN have <code>7*7*(1168-16)</code> multiplications?</li>
+<li>What is a “receptive field”?</li>
+<li>What is the size of the receptive field of an activation after two stride 2 convolutions? Why?</li>
+<li>Run <em>conv-example.xlsx</em> yourself and experiment with <em>trace precedents</em>.</li>
+<li>Have a look at Jeremy or Sylvain’s list of recent Twitter “like”s, and see if you find any interesting resources or ideas there.</li>
+<li>How is a color image represented as a tensor?</li>
+<li>How does a convolution work with a color input?</li>
+<li>What method can we use to see that data in <code>DataLoaders</code>?</li>
+<li>Why do we double the number of filters after each stride-2 conv?</li>
+<li>Why do we use a larger kernel in the first conv with MNIST (with <code>simple_cnn</code>)?</li>
+<li>What information does <code>ActivationStats</code> save for each layer?</li>
+<li>How can we access a learner’s callback after training?</li>
+<li>What are the three statistics plotted by <code>plot_layer_stats</code>? What does the x-axis represent?</li>
+<li>Why are activations near zero problematic?</li>
+<li>What are the upsides and downsides of training with a larger batch size?</li>
+<li>Why should we avoid using a high learning rate at the start of training?</li>
+<li>What is 1cycle training?</li>
+<li>What are the benefits of training with a high learning rate?</li>
+<li>Why do we want to use a low learning rate at the end of training?</li>
+<li>What is “cyclical momentum”?</li>
+<li>What callback tracks hyperparameter values during training (along with other information)?</li>
+<li>What does one column of pixels in the <code>color_dim</code> plot represent?</li>
+<li>What does “bad training” look like in <code>color_dim</code>? Why?</li>
+<li>What trainable parameters does a batch normalization layer contain?</li>
+<li>What statistics are used to normalize in batch normalization during training? How about during validation?</li>
+<li>Why do models with batch normalization layers generalize better?</li>
+</ol>
+<section id="further-research" class="level3">
+<h3 class="anchored" data-anchor-id="further-research">Further Research</h3>
+<ol type="1">
+<li>What features other than edge detectors have been used in computer vision (especially before deep learning became popular)?</li>
+<li>There are other normalization layers available in PyTorch. Try them out and see what works best. Learn about why other normalization layers have been developed, and how they differ from batch normalization.</li>
+<li>Try moving the activation function after the batch normalization layer in <code>conv</code>. Does it make a difference? See what you can find out about what order is recommended, and why.</li>
+</ol>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/fastai\.github\.io\/fastbook2e");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./book12.html" class="pagination-link" aria-label="*A Language Model from Scratch*">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title"><em>A Language Model from Scratch</em></span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./resnet.html" class="pagination-link" aria-label="ResNets">
+        <span class="nav-page-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">ResNets</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

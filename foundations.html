@@ -1,0 +1,1714 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.1">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>17&nbsp; A Neural Net from the Foundations – Practical Deep Learning for Coders</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./book18.html" rel="next">
+<link href="./accel_sgd.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="styles.css">
+<meta property="og:title" content="17&nbsp; A Neural Net from the Foundations – Practical Deep Learning for Coders">
+<meta property="og:description" content="">
+<meta property="og:site_name" content="Practical Deep Learning for Coders">
+<meta name="twitter:title" content="17&nbsp; A Neural Net from the Foundations – Practical Deep Learning for Coders">
+<meta name="twitter:description" content="">
+<meta name="twitter:creator" content="jeremyphoward">
+<meta name="twitter:site" content="fastdotai">
+<meta name="twitter:card" content="summary">
+</head>
+
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./book11.html">From the Foundations</a></li><li class="breadcrumb-item"><a href="./foundations.html"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">A Neural Net from the Foundations</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Practical Deep Learning for Coders</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Getting Started</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./intro.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Your Deep Learning Journey</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./book2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title"><em>From Model to Production</em></span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./book3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">AI and Data Ethics</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">The Details</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mnist_basics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Under the Hood: Training a Digit Classifier</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./book5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title"><em>Image Classification</em></span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./book6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title"><em>Other Computer Vision Problems</em></span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./book7.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title"><em>Training a State-of-the-Art Model</em></span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./book8.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title"><em>Collaborative Filtering Deep Dive</em></span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./book9.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title"><em>Tabular Modeling Deep Dive</em></span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./book10.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title"><em>NLP Deep Dive: RNNs</em></span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">From the Foundations</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./book11.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title"><em>Data Munging with fastai’s Mid-Level API</em></span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./book12.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title"><em>A Language Model from Scratch</em></span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./convolutions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Convolutional Neural Networks</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./resnet.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">ResNets</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./book15.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title"><em>Application Architectures Deep Dive</em></span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accel_sgd.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">The Training Process</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./foundations.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">A Neural Net from the Foundations</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./book18.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title"><em>CNN Interpretation with CAM</em></span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./book19.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title"><em>A fastai Learner from Scratch</em></span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./book20.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title"><em>Concluding Thoughts</em></span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#building-a-neural-net-layer-from-scratch" id="toc-building-a-neural-net-layer-from-scratch" class="nav-link active" data-scroll-target="#building-a-neural-net-layer-from-scratch"><span class="header-section-number">17.1</span> Building a Neural Net Layer from Scratch</a>
+  <ul class="collapse">
+  <li><a href="#modeling-a-neuron" id="toc-modeling-a-neuron" class="nav-link" data-scroll-target="#modeling-a-neuron">Modeling a Neuron</a></li>
+  <li><a href="#matrix-multiplication-from-scratch" id="toc-matrix-multiplication-from-scratch" class="nav-link" data-scroll-target="#matrix-multiplication-from-scratch">Matrix Multiplication from Scratch</a></li>
+  <li><a href="#elementwise-arithmetic" id="toc-elementwise-arithmetic" class="nav-link" data-scroll-target="#elementwise-arithmetic">Elementwise Arithmetic</a></li>
+  <li><a href="#broadcasting" id="toc-broadcasting" class="nav-link" data-scroll-target="#broadcasting">Broadcasting</a></li>
+  <li><a href="#einstein-summation" id="toc-einstein-summation" class="nav-link" data-scroll-target="#einstein-summation">Einstein Summation</a></li>
+  </ul></li>
+  <li><a href="#the-forward-and-backward-passes" id="toc-the-forward-and-backward-passes" class="nav-link" data-scroll-target="#the-forward-and-backward-passes"><span class="header-section-number">17.2</span> The Forward and Backward Passes</a>
+  <ul class="collapse">
+  <li><a href="#defining-and-initializing-a-layer" id="toc-defining-and-initializing-a-layer" class="nav-link" data-scroll-target="#defining-and-initializing-a-layer">Defining and Initializing a Layer</a></li>
+  <li><a href="#gradients-and-the-backward-pass" id="toc-gradients-and-the-backward-pass" class="nav-link" data-scroll-target="#gradients-and-the-backward-pass">Gradients and the Backward Pass</a></li>
+  <li><a href="#sidebar-sympy" id="toc-sidebar-sympy" class="nav-link" data-scroll-target="#sidebar-sympy">Sidebar: SymPy</a></li>
+  <li><a href="#end-sidebar" id="toc-end-sidebar" class="nav-link" data-scroll-target="#end-sidebar">End sidebar</a></li>
+  <li><a href="#refactoring-the-model" id="toc-refactoring-the-model" class="nav-link" data-scroll-target="#refactoring-the-model">Refactoring the Model</a></li>
+  <li><a href="#going-to-pytorch" id="toc-going-to-pytorch" class="nav-link" data-scroll-target="#going-to-pytorch">Going to PyTorch</a></li>
+  </ul></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion"><span class="header-section-number">17.3</span> Conclusion</a></li>
+  <li><a href="#questionnaire" id="toc-questionnaire" class="nav-link" data-scroll-target="#questionnaire"><span class="header-section-number">17.4</span> Questionnaire</a>
+  <ul class="collapse">
+  <li><a href="#further-research" id="toc-further-research" class="nav-link" data-scroll-target="#further-research">Further Research</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./book11.html">From the Foundations</a></li><li class="breadcrumb-item"><a href="./foundations.html"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">A Neural Net from the Foundations</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span id="sec-foundations" class="quarto-section-identifier"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">A Neural Net from the Foundations</span></span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>This chapter begins a journey where we will dig deep into the internals of the models we used in the previous chapters. We will be covering many of the same things we’ve seen before, but this time around we’ll be looking much more closely at the implementation details, and much less closely at the practical issues of how and why things are as they are.</p>
+<p>We will build everything from scratch, only using basic indexing into a tensor. We’ll write a neural net from the ground up, then implement backpropagation manually, so we know exactly what’s happening in PyTorch when we call <code>loss.backward</code>. We’ll also see how to extend PyTorch with custom <em>autograd</em> functions that allow us to specify our own forward and backward computations.</p>
+<section id="building-a-neural-net-layer-from-scratch" class="level2" data-number="17.1">
+<h2 data-number="17.1" class="anchored" data-anchor-id="building-a-neural-net-layer-from-scratch"><span class="header-section-number">17.1</span> Building a Neural Net Layer from Scratch</h2>
+<p>Let’s start by refreshing our understanding of how matrix multiplication is used in a basic neural network. Since we’re building everything up from scratch, we’ll use nothing but plain Python initially (except for indexing into PyTorch tensors), and then replace the plain Python with PyTorch functionality once we’ve seen how to create it.</p>
+<section id="modeling-a-neuron" class="level3">
+<h3 class="anchored" data-anchor-id="modeling-a-neuron">Modeling a Neuron</h3>
+<p>A neuron receives a given number of inputs and has an internal weight for each of them. It sums those weighted inputs to produce an output and adds an inner bias. In math, this can be written as:</p>
+<p><span class="math display">\[ out = \sum_{i=1}^{n} x_{i} w_{i} + b\]</span></p>
+<p>if we name our inputs <span class="math inline">\((x_{1},\dots,x_{n})\)</span>, our weights <span class="math inline">\((w_{1},\dots,w_{n})\)</span>, and our bias <span class="math inline">\(b\)</span>. In code this translates into:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>output <span class="op">=</span> <span class="bu">sum</span>([x<span class="op">*</span>w <span class="cf">for</span> x,w <span class="kw">in</span> <span class="bu">zip</span>(inputs,weights)]) <span class="op">+</span> bias</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>This output is then fed into a nonlinear function called an <em>activation function</em> before being sent to another neuron. In deep learning the most common of these is the <em>rectified Linear unit</em>, or <em>ReLU</em>, which, as we’ve seen, is a fancy way of saying:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> relu(x): <span class="cf">return</span> x <span class="cf">if</span> x <span class="op">&gt;=</span> <span class="dv">0</span> <span class="cf">else</span> <span class="dv">0</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>A deep learning model is then built by stacking a lot of those neurons in successive layers. We create a first layer with a certain number of neurons (known as <em>hidden size</em>) and link all the inputs to each of those neurons. Such a layer is often called a <em>fully connected layer</em> or a <em>dense layer</em> (for densely connected), or a <em>linear layer</em>.</p>
+<p>It requires to compute, for each <code>input</code> in our batch and each neuron with a give <code>weight</code>, the dot product:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="bu">sum</span>([x<span class="op">*</span>w <span class="cf">for</span> x,w <span class="kw">in</span> <span class="bu">zip</span>(<span class="bu">input</span>,weight)])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>If you have done a little bit of linear algebra, you may remember that having a lot of those dot products happens when you do a <em>matrix multiplication</em>. More precisely, if our inputs are in a matrix <code>x</code> with a size of <code>batch_size</code> by <code>n_inputs</code>, and if we have grouped the weights of our neurons in a matrix <code>w</code> of size <code>n_neurons</code> by <code>n_inputs</code> (each neuron must have the same number of weights as it has inputs) and all the biases in a vector <code>b</code> of size <code>n_neurons</code>, then the output of this fully connected layer is:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> x <span class="op">@</span> w.t() <span class="op">+</span> b</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>where <code>@</code> represents the matrix product and <code>w.t()</code> is the transpose matrix of <code>w</code>. The output <code>y</code> is then of size <code>batch_size</code> by <code>n_neurons</code>, and in position <code>(i,j)</code> we have (for the mathy folks out there):</p>
+<p><span class="math display">\[y_{i,j} = \sum_{k=1}^{n} x_{i,k} w_{k,j} + b_{j}\]</span></p>
+<p>Or in code:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>y[i,j] <span class="op">=</span> <span class="bu">sum</span>([a <span class="op">*</span> b <span class="cf">for</span> a,b <span class="kw">in</span> <span class="bu">zip</span>(x[i,:],w[j,:])]) <span class="op">+</span> b[j]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The transpose is necessary because in the mathematical definition of the matrix product <code>m @ n</code>, the coefficient <code>(i,j)</code> is:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="bu">sum</span>([a <span class="op">*</span> b <span class="cf">for</span> a,b <span class="kw">in</span> <span class="bu">zip</span>(m[i,:],n[:,j])])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>So the very basic operation we need is a matrix multiplication, as it’s what is hidden in the core of a neural net.</p>
+</section>
+<section id="matrix-multiplication-from-scratch" class="level3">
+<h3 class="anchored" data-anchor-id="matrix-multiplication-from-scratch">Matrix Multiplication from Scratch</h3>
+<p>Let’s write a function that computes the matrix product of two tensors, before we allow ourselves to use the PyTorch version of it. We will only use the indexing in PyTorch tensors:</p>
+<div id="cell-10" class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> torch <span class="im">import</span> tensor</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We’ll need three nested <code>for</code> loops: one for the row indices, one for the column indices, and one for the inner sum. <code>ac</code> and <code>ar</code> stand for number of columns of <code>a</code> and number of rows of <code>a</code>, respectively (the same convention is followed for <code>b</code>), and we make sure calculating the matrix product is possible by checking that <code>a</code> has as many columns as <code>b</code> has rows:</p>
+<div id="cell-12" class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> matmul(a,b):</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    ar,ac <span class="op">=</span> a.shape <span class="co"># n_rows * n_cols</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    br,bc <span class="op">=</span> b.shape</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> ac<span class="op">==</span>br</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    c <span class="op">=</span> torch.zeros(ar, bc)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(ar):</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(bc):</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(ac): c[i,j] <span class="op">+=</span> a[i,k] <span class="op">*</span> b[k,j]</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> c</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>To test this out, we’ll pretend (using random matrices) that we’re working with a small batch of 5 MNIST images, flattened into 28×28 vectors, with linear model to turn them into 10 activations:</p>
+<div id="cell-14" class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>m1 <span class="op">=</span> torch.randn(<span class="dv">5</span>,<span class="dv">28</span><span class="op">*</span><span class="dv">28</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>m2 <span class="op">=</span> torch.randn(<span class="dv">784</span>,<span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Let’s time our function, using the Jupyter “magic” command <code>%time</code>:</p>
+<div id="cell-16" class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>time t1<span class="op">=</span>matmul(m1, m2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>CPU times: user 211 ms, sys: 504 µs, total: 212 ms
+Wall time: 211 ms</code></pre>
+</div>
+</div>
+<p>And see how that compares to PyTorch’s built-in <code>@</code>:</p>
+<div id="cell-18" class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>timeit <span class="op">-</span>n <span class="dv">20</span> t2<span class="op">=</span>m1<span class="op">@</span>m2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>The slowest run took 9.18 times longer than the fastest. This could mean that an intermediate result is being cached.
+8.15 µs ± 9.07 µs per loop (mean ± std. dev. of 7 runs, 20 loops each)</code></pre>
+</div>
+</div>
+<p>As we can see, in Python three nested loops is a very bad idea! Python is a slow language, and this isn’t going to be very efficient. We see here that PyTorch is around 100,000 times faster than Python—and that’s before we even start using the GPU!</p>
+<p>Where does this difference come from? PyTorch didn’t write its matrix multiplication in Python, but rather in C++ to make it fast. In general, whenever we do computations on tensors we will need to <em>vectorize</em> them so that we can take advantage of the speed of PyTorch, usually by using two techniques: elementwise arithmetic and broadcasting.</p>
+</section>
+<section id="elementwise-arithmetic" class="level3">
+<h3 class="anchored" data-anchor-id="elementwise-arithmetic">Elementwise Arithmetic</h3>
+<p>All the basic operators (<code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>, <code>&gt;</code>, <code>&lt;</code>, <code>==</code>) can be applied elementwise. That means if we write <code>a+b</code> for two tensors <code>a</code> and <code>b</code> that have the same shape, we will get a tensor composed of the sums the elements of <code>a</code> and <code>b</code>:</p>
+<div id="cell-22" class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> tensor([<span class="fl">10.</span>, <span class="dv">6</span>, <span class="op">-</span><span class="dv">4</span>])</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>b <span class="op">=</span> tensor([<span class="fl">2.</span>, <span class="dv">8</span>, <span class="dv">7</span>])</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>a <span class="op">+</span> b</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>tensor([12., 14.,  3.])</code></pre>
+</div>
+</div>
+<p>The Booleans operators will return an array of Booleans:</p>
+<div id="cell-24" class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>a <span class="op">&lt;</span> b</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>tensor([False,  True,  True])</code></pre>
+</div>
+</div>
+<p>If we want to know if every element of <code>a</code> is less than the corresponding element in <code>b</code>, or if two tensors are equal, we need to combine those elementwise operations with <code>torch.all</code>:</p>
+<div id="cell-26" class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>(a <span class="op">&lt;</span> b).<span class="bu">all</span>(), (a<span class="op">==</span>b).<span class="bu">all</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>(tensor(False), tensor(False))</code></pre>
+</div>
+</div>
+<p>Reduction operations like <code>all()</code>, <code>sum()</code> and <code>mean()</code> return tensors with only one element, called rank-0 tensors. If you want to convert this to a plain Python Boolean or number, you need to call <code>.item()</code>:</p>
+<div id="cell-28" class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>(a <span class="op">+</span> b).mean().item()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>9.666666984558105</code></pre>
+</div>
+</div>
+<p>The elementwise operations work on tensors of any rank, as long as they have the same shape:</p>
+<div id="cell-30" class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> tensor([[<span class="fl">1.</span>, <span class="dv">2</span>, <span class="dv">3</span>], [<span class="dv">4</span>,<span class="dv">5</span>,<span class="dv">6</span>], [<span class="dv">7</span>,<span class="dv">8</span>,<span class="dv">9</span>]])</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>m<span class="op">*</span>m</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>tensor([[ 1.,  4.,  9.],
+        [16., 25., 36.],
+        [49., 64., 81.]])</code></pre>
+</div>
+</div>
+<p>However you can’t perform elementwise operations on tensors that don’t have the same shape (unless they are broadcastable, as discussed in the next section):</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>m<span class="op">*</span>tensor([[<span class="fl">1.</span>, <span class="dv">2</span>, <span class="dv">3</span>], [<span class="dv">4</span>,<span class="dv">5</span>,<span class="dv">6</span>]])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<pre><code>---------------------------------------------------------------------------
+RuntimeError                              Traceback (most recent call last)
+Cell In [14], line 1
+----&gt; 1 m*n
+
+RuntimeError: The size of tensor a (3) must match the size of tensor b (2) at non-singleton dimension 0</code></pre>
+<p>With elementwise arithmetic, we can remove one of our three nested loops: we can multiply the tensors that correspond to the <code>i</code>-th row of <code>a</code> and the <code>j</code>-th column of <code>b</code> before summing all the elements, which will speed things up because the inner loop will now be executed by PyTorch at C speed.</p>
+<p>To access one column or row, we can simply write <code>a[i,:]</code> or <code>b[:,j]</code>. The <code>:</code> means take everything in that dimension. We could restrict this and take only a slice of that particular dimension by passing a range, like <code>1:5</code>, instead of just <code>:</code>. In that case, we would take the elements in columns or rows 1 to 4 (the second number is noninclusive).</p>
+<p>One simplification is that we can always omit a trailing colon, so <code>a[i,:]</code> can be abbreviated to <code>a[i]</code>. With all of that in mind, we can write a new version of our matrix multiplication:</p>
+<div id="cell-33" class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> matmul(a,b):</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>    ar,ac <span class="op">=</span> a.shape</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>    br,bc <span class="op">=</span> b.shape</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> ac<span class="op">==</span>br</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>    c <span class="op">=</span> torch.zeros(ar, bc)</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(ar):</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(bc): c[i,j] <span class="op">=</span> (a[i] <span class="op">*</span> b[:,j]).<span class="bu">sum</span>()</span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> c</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-34" class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>timeit <span class="op">-</span>n <span class="dv">20</span> t3 <span class="op">=</span> matmul(m1,m2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>257 µs ± 25.4 µs per loop (mean ± std. dev. of 7 runs, 20 loops each)</code></pre>
+</div>
+</div>
+<p>We’re already ~700 times faster, just by removing that inner <code>for</code> loop! And that’s just the beginning—with broadcasting we can remove another loop and get an even more important speed up.</p>
+</section>
+<section id="broadcasting" class="level3">
+<h3 class="anchored" data-anchor-id="broadcasting">Broadcasting</h3>
+<p>As we discussed in <a href="mnist_basics.html" class="quarto-xref"><span>Chapter 4</span></a>, broadcasting is a term introduced by the <a href="https://docs.scipy.org/doc/">NumPy library</a> that describes how tensors of different ranks are treated during arithmetic operations. For instance, it’s obvious there is no way to add a 3×3 matrix with a 4×5 matrix, but what if we want to add one scalar (which can be represented as a 1×1 tensor) with a matrix? Or a vector of size 3 with a 3×4 matrix? In both cases, we can find a way to make sense of this operation.</p>
+<p>Broadcasting gives specific rules to codify when shapes are compatible when trying to do an elementwise operation, and how the tensor of the smaller shape is expanded to match the tensor of the bigger shape. It’s essential to master those rules if you want to be able to write code that executes quickly. In this section, we’ll expand our previous treatment of broadcasting to understand these rules.</p>
+<section id="broadcasting-with-a-scalar" class="level4">
+<h4 class="anchored" data-anchor-id="broadcasting-with-a-scalar">Broadcasting with a scalar</h4>
+<p>Broadcasting with a scalar is the easiest type of broadcasting. When we have a tensor <code>a</code> and a scalar, we just imagine a tensor of the same shape as <code>a</code> filled with that scalar and perform the operation:</p>
+<div id="cell-40" class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> tensor([<span class="fl">10.</span>, <span class="dv">6</span>, <span class="op">-</span><span class="dv">4</span>])</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>a <span class="op">&gt;</span> <span class="dv">0</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>tensor([ True,  True, False])</code></pre>
+</div>
+</div>
+<p>How are we able to do this comparison? <code>0</code> is being <em>broadcast</em> to have the same dimensions as <code>a</code>. Note that this is done without creating a tensor full of zeros in memory (that would be very inefficient).</p>
+<p>This is very useful if you want to normalize your dataset by subtracting the mean (a scalar) from the entire data set (a matrix) and dividing by the standard deviation (another scalar):</p>
+<div id="cell-42" class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> tensor([[<span class="fl">1.</span>, <span class="dv">2</span>, <span class="dv">3</span>], [<span class="dv">4</span>,<span class="dv">5</span>,<span class="dv">6</span>], [<span class="dv">7</span>,<span class="dv">8</span>,<span class="dv">9</span>]])</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>(m <span class="op">-</span> <span class="dv">5</span>) <span class="op">/</span> <span class="fl">2.73</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>tensor([[-1.4652, -1.0989, -0.7326],
+        [-0.3663,  0.0000,  0.3663],
+        [ 0.7326,  1.0989,  1.4652]])</code></pre>
+</div>
+</div>
+<p>What if have different means for each row of the matrix? in that case you will need to broadcast a vector to a matrix.</p>
+</section>
+<section id="broadcasting-a-vector-to-a-matrix" class="level4">
+<h4 class="anchored" data-anchor-id="broadcasting-a-vector-to-a-matrix">Broadcasting a vector to a matrix</h4>
+<p>We can broadcast a vector to a matrix as follows:</p>
+<div id="cell-46" class="cell">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>c <span class="op">=</span> tensor([<span class="fl">10.</span>,<span class="dv">20</span>,<span class="dv">30</span>])</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> tensor([[<span class="fl">1.</span>, <span class="dv">2</span>, <span class="dv">3</span>], [<span class="dv">4</span>,<span class="dv">5</span>,<span class="dv">6</span>], [<span class="dv">7</span>,<span class="dv">8</span>,<span class="dv">9</span>]])</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>m.shape,c.shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>(torch.Size([3, 3]), torch.Size([3]))</code></pre>
+</div>
+</div>
+<div id="cell-47" class="cell">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>m <span class="op">+</span> c</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>tensor([[11., 22., 33.],
+        [14., 25., 36.],
+        [17., 28., 39.]])</code></pre>
+</div>
+</div>
+<p>Here the elements of <code>c</code> are expanded to make three rows that match, making the operation possible. Again, PyTorch doesn’t actually create three copies of <code>c</code> in memory. This is done by the <code>expand_as</code> method behind the scenes:</p>
+<div id="cell-49" class="cell">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>c.expand_as(m)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>tensor([[10., 20., 30.],
+        [10., 20., 30.],
+        [10., 20., 30.]])</code></pre>
+</div>
+</div>
+<p>If we look at the corresponding tensor, we can ask for its <code>storage</code> property (which shows the actual contents of the memory used for the tensor) to check there is no useless data stored:</p>
+<div id="cell-51" class="cell">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> c.expand_as(m)</span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>t.storage()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code> 10.0
+ 20.0
+ 30.0
+[torch.storage._TypedStorage(dtype=torch.float32, device=cpu) of size 3]</code></pre>
+</div>
+</div>
+<p>Even though the tensor officially has nine elements, only three scalars are stored in memory. This is possible thanks to the clever trick of giving that dimension a <em>stride</em> of 0 (which means that when PyTorch looks for the next row by adding the stride, it doesn’t move):</p>
+<div id="cell-53" class="cell">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>t.stride(), t.shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>((0, 1), torch.Size([3, 3]))</code></pre>
+</div>
+</div>
+<p>Since <code>m</code> is of size 3×3, there are two ways to do broadcasting. The fact it was done on the last dimension is a convention that comes from the rules of broadcasting and has nothing to do with the way we ordered our tensors. If instead we do this, we get the same result:</p>
+<div id="cell-55" class="cell">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>c <span class="op">+</span> m</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>tensor([[11., 22., 33.],
+        [14., 25., 36.],
+        [17., 28., 39.]])</code></pre>
+</div>
+</div>
+<p>In fact, it’s only possible to broadcast a vector of size <code>n</code> with a matrix of size <code>m</code> by <code>n</code>:</p>
+<div id="cell-57" class="cell">
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>c <span class="op">=</span> tensor([<span class="fl">10.</span>,<span class="dv">20</span>,<span class="dv">30</span>])</span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> tensor([[<span class="fl">1.</span>, <span class="dv">2</span>, <span class="dv">3</span>], [<span class="dv">4</span>,<span class="dv">5</span>,<span class="dv">6</span>]])</span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>c<span class="op">+</span>m</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>tensor([[11., 22., 33.],
+        [14., 25., 36.]])</code></pre>
+</div>
+</div>
+<p>This won’t work:</p>
+<div class="sourceCode" id="cb47"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>c <span class="op">=</span> tensor([<span class="fl">10.</span>,<span class="dv">20</span>])</span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>c<span class="op">+</span>tensor([[<span class="fl">1.</span>, <span class="dv">2</span>, <span class="dv">3</span>], [<span class="dv">4</span>,<span class="dv">5</span>,<span class="dv">6</span>]])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<pre><code>---------------------------------------------------------------------------
+RuntimeError                              Traceback (most recent call last)
+Cell In [26], line 3
+      1 c = tensor([10.,20])
+      2 m = tensor([[1., 2, 3], [4,5,6]])
+----&gt; 3 c+m
+
+RuntimeError: The size of tensor a (2) must match the size of tensor b (3) at non-singleton dimension 1</code></pre>
+<p>If we want to broadcast in the other dimension, we have to change the shape of our vector to make it a 3×1 matrix. This is done with the <code>unsqueeze</code> method in PyTorch:</p>
+<div id="cell-60" class="cell">
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>c <span class="op">=</span> tensor([<span class="fl">10.</span>,<span class="dv">20</span>,<span class="dv">30</span>])</span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> tensor([[<span class="fl">1.</span>, <span class="dv">2</span>, <span class="dv">3</span>], [<span class="dv">4</span>,<span class="dv">5</span>,<span class="dv">6</span>], [<span class="dv">7</span>,<span class="dv">8</span>,<span class="dv">9</span>]])</span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>c <span class="op">=</span> c.unsqueeze(<span class="dv">1</span>)</span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a>m.shape,c.shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>(torch.Size([3, 3]), torch.Size([3, 1]))</code></pre>
+</div>
+</div>
+<p>This time, <code>c</code> is expanded on the column side:</p>
+<div id="cell-62" class="cell">
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>c<span class="op">+</span>m</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>tensor([[11., 12., 13.],
+        [24., 25., 26.],
+        [37., 38., 39.]])</code></pre>
+</div>
+</div>
+<p>Like before, only three scalars are stored in memory:</p>
+<div id="cell-64" class="cell">
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> c.expand_as(m)</span>
+<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a>t.storage()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code> 10.0
+ 20.0
+ 30.0
+[torch.storage._TypedStorage(dtype=torch.float32, device=cpu) of size 3]</code></pre>
+</div>
+</div>
+<p>And the expanded tensor has the right shape because the column dimension has a stride of 0:</p>
+<div id="cell-66" class="cell">
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a>t.stride(), t.shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>((1, 0), torch.Size([3, 3]))</code></pre>
+</div>
+</div>
+<p>With broadcasting, by default if we need to add dimensions, they are added at the beginning. When we were broadcasting before, Pytorch was doing <code>c.unsqueeze(0)</code> behind the scenes:</p>
+<div id="cell-68" class="cell">
+<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a>c <span class="op">=</span> tensor([<span class="fl">10.</span>,<span class="dv">20</span>,<span class="dv">30</span>])</span>
+<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a>c.shape, c.unsqueeze(<span class="dv">0</span>).shape,c.unsqueeze(<span class="dv">1</span>).shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>(torch.Size([3]), torch.Size([1, 3]), torch.Size([3, 1]))</code></pre>
+</div>
+</div>
+<p>The <code>unsqueeze</code> command can be replaced by <code>None</code> indexing:</p>
+<div id="cell-70" class="cell">
+<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a>c.shape, c[<span class="va">None</span>,:].shape,c[:,<span class="va">None</span>].shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>(torch.Size([3]), torch.Size([1, 3]), torch.Size([3, 1]))</code></pre>
+</div>
+</div>
+<p>You can always omit trailing colons, and <code>...</code> means all preceding dimensions:</p>
+<div id="cell-72" class="cell">
+<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a>c[<span class="va">None</span>].shape,c[...,<span class="va">None</span>].shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>(torch.Size([1, 3]), torch.Size([3, 1]))</code></pre>
+</div>
+</div>
+<p>With this, we can remove another <code>for</code> loop in our matrix multiplication function. Now, instead of multiplying <code>a[i]</code> with <code>b[:,j]</code>, we can multiply <code>a[i]</code> with the whole matrix <code>b</code> using broadcasting, then sum the results:</p>
+<div id="cell-74" class="cell">
+<div class="sourceCode cell-code" id="cb63"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> matmul(a,b):</span>
+<span id="cb63-2"><a href="#cb63-2" aria-hidden="true" tabindex="-1"></a>    ar,ac <span class="op">=</span> a.shape</span>
+<span id="cb63-3"><a href="#cb63-3" aria-hidden="true" tabindex="-1"></a>    br,bc <span class="op">=</span> b.shape</span>
+<span id="cb63-4"><a href="#cb63-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> ac<span class="op">==</span>br</span>
+<span id="cb63-5"><a href="#cb63-5" aria-hidden="true" tabindex="-1"></a>    c <span class="op">=</span> torch.zeros(ar, bc)</span>
+<span id="cb63-6"><a href="#cb63-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(ar):</span>
+<span id="cb63-7"><a href="#cb63-7" aria-hidden="true" tabindex="-1"></a><span class="co">#       c[i,j] = (a[i,:]          * b[:,j]).sum() # previous</span></span>
+<span id="cb63-8"><a href="#cb63-8" aria-hidden="true" tabindex="-1"></a>        c[i]   <span class="op">=</span> (a[i  ].unsqueeze(<span class="op">-</span><span class="dv">1</span>) <span class="op">*</span> b).<span class="bu">sum</span>(dim<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb63-9"><a href="#cb63-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> c</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-75" class="cell">
+<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>timeit <span class="op">-</span>n <span class="dv">20</span> t4 <span class="op">=</span> matmul(m1,m2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>43.9 µs ± 8.28 µs per loop (mean ± std. dev. of 7 runs, 20 loops each)</code></pre>
+</div>
+</div>
+<p>We’re now 3,700 times faster than our first implementation! Before we move on, let’s discuss the rules of broadcasting in a little more detail.</p>
+</section>
+<section id="broadcasting-rules" class="level4">
+<h4 class="anchored" data-anchor-id="broadcasting-rules">Broadcasting rules</h4>
+<p>When operating on two tensors, PyTorch compares their shapes elementwise. It starts with the <em>trailing dimensions</em> and works its way backward, adding 1 when it meets empty dimensions. Two dimensions are <em>compatible</em> when one of the following is true:</p>
+<ul>
+<li>They are equal.</li>
+<li>One of them is 1, in which case that dimension is broadcast to make it the same as the other.</li>
+</ul>
+<p>Arrays do not need to have the same number of dimensions. For example, if you have a 256×256×3 array of RGB values, and you want to scale each color in the image by a different value, you can multiply the image by a one-dimensional array with three values. Lining up the sizes of the trailing axes of these arrays according to the broadcast rules, shows that they are compatible:</p>
+<pre><code>Image  (3d tensor): 256 x 256 x 3
+Scale  (1d tensor):  (1)   (1)  3
+Result (3d tensor): 256 x 256 x 3</code></pre>
+<p>However, a 2D tensor of size 256×256 isn’t compatible with our image:</p>
+<pre><code>Image  (3d tensor): 256 x 256 x   3
+Scale  (2d tensor):  (1)  256 x 256
+Error</code></pre>
+<p>In our earlier examples we had with a 3×3 matrix and a vector of size 3, broadcasting was done on the rows:</p>
+<pre><code>Matrix (2d tensor):   3 x 3
+Vector (1d tensor): (1)   3
+Result (2d tensor):   3 x 3</code></pre>
+<p>As an exercise, try to determine what dimensions to add (and where) when you need to normalize a batch of images of size <code>64 x 3 x 256 x 256</code> with vectors of three elements (one for the mean and one for the standard deviation).</p>
+<p>Another useful way of simplifying tensor manipulations is the use of Einstein summations convention.</p>
+</section>
+</section>
+<section id="einstein-summation" class="level3">
+<h3 class="anchored" data-anchor-id="einstein-summation">Einstein Summation</h3>
+<p>Before using the PyTorch operation <code>@</code> or <code>torch.matmul</code>, there is one last way we can implement matrix multiplication: Einstein summation (<code>einsum</code>). This is a compact representation for combining products and sums in a general way. We write an equation like this:</p>
+<pre><code>ik,kj -&gt; ij</code></pre>
+<p>The lefthand side represents the operands dimensions, separated by commas. Here we have two tensors that each have two dimensions (<code>i,k</code> and <code>k,j</code>). The righthand side represents the result dimensions, so here we have a tensor with two dimensions <code>i,j</code>.</p>
+<p>The rules of Einstein summation notation are as follows:</p>
+<ol type="1">
+<li>Repeated indices on the left side are implicitly summed over if they are not on the right side.</li>
+<li>Each index can appear at most twice on the left side.</li>
+<li>The unrepeated indices on the left side must appear on the right side.</li>
+</ol>
+<p>So in our example, since <code>k</code> is repeated, we sum over that index. In the end the formula represents the matrix obtained when we put in <code>(i,j)</code> the sum of all the coefficients <code>(i,k)</code> in the first tensor multiplied by the coefficients <code>(k,j)</code> in the second tensor… which is the matrix product! Here is how we can code this in PyTorch:</p>
+<div id="cell-82" class="cell">
+<div class="sourceCode cell-code" id="cb70"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> matmul(a,b): <span class="cf">return</span> torch.einsum(<span class="st">'ik,kj-&gt;ij'</span>, a, b)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Einstein summation is a very practical way of expressing operations involving indexing and sum of products. Note that you can have just one member on the lefthand side. For instance, this:</p>
+<div class="sourceCode" id="cb71"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a>torch.einsum(<span class="st">'ij-&gt;ji'</span>, a)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>returns the transpose of the matrix <code>a</code>. You can also have three or more members. This:</p>
+<div class="sourceCode" id="cb72"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a>torch.einsum(<span class="st">'bi,ij,bj-&gt;b'</span>, a, b, c)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>will return a vector of size <code>b</code> where the <code>k</code>-th coordinate is the sum of <code>a[k,i] b[i,j] c[k,j]</code>. This notation is particularly convenient when you have more dimensions because of batches. For example, if you have two batches of matrices and want to compute the matrix product per batch, you would could this:</p>
+<div class="sourceCode" id="cb73"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a>torch.einsum(<span class="st">'bik,bkj-&gt;bij'</span>, a, b)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Let’s go back to our new <code>matmul</code> implementation using <code>einsum</code> and look at its speed:</p>
+<div id="cell-84" class="cell">
+<div class="sourceCode cell-code" id="cb74"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>timeit <span class="op">-</span>n <span class="dv">20</span> t5 <span class="op">=</span> matmul(m1,m2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>19 µs ± 13.2 µs per loop (mean ± std. dev. of 7 runs, 20 loops each)</code></pre>
+</div>
+</div>
+<p>As you can see, not only is it practical, but it’s <em>very</em> fast. <code>einsum</code> is often the fastest way to do custom operations in PyTorch, without diving into C++ and CUDA. (But it’s generally not as fast as carefully optimized CUDA code, as you see from the results in “Matrix Multiplication from Scratch”.)</p>
+<p>Now that we know how to implement a matrix multiplication from scratch, we are ready to build our neural net—specifically its forward and backward passes—using just matrix multiplications.</p>
+</section>
+</section>
+<section id="the-forward-and-backward-passes" class="level2" data-number="17.2">
+<h2 data-number="17.2" class="anchored" data-anchor-id="the-forward-and-backward-passes"><span class="header-section-number">17.2</span> The Forward and Backward Passes</h2>
+<p>As we saw in <a href="mnist_basics.html" class="quarto-xref"><span>Chapter 4</span></a>, to train a model, we will need to compute all the gradients of a given loss with respect to its parameters, which is known as the <em>backward pass</em>. The <em>forward pass</em> is where we compute the output of the model on a given input, based on the matrix products. As we define our first neural net, we will also delve into the problem of properly initializing the weights, which is crucial for making training start properly.</p>
+<section id="defining-and-initializing-a-layer" class="level3">
+<h3 class="anchored" data-anchor-id="defining-and-initializing-a-layer">Defining and Initializing a Layer</h3>
+<p>We will take the example of a two-layer neural net first. As we’ve seen, one layer can be expressed as <code>y = x @ w + b</code>, with <code>x</code> our inputs, <code>y</code> our outputs, <code>w</code> the weights of the layer (which is of size number of inputs by number of neurons if we don’t transpose like before), and <code>b</code> is the bias vector:</p>
+<div id="cell-91" class="cell">
+<div class="sourceCode cell-code" id="cb76"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> lin(x, w, b): <span class="cf">return</span> x <span class="op">@</span> w <span class="op">+</span> b</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We can stack the second layer on top of the first, but since mathematically the composition of two linear operations is another linear operation, this only makes sense if we put something nonlinear in the middle, called an activation function. As mentioned at the beginning of the chapter, in deep learning applications the activation function most commonly used is a ReLU, which returns the maximum of <code>x</code> and <code>0</code>.</p>
+<p>We won’t actually train our model in this chapter, so we’ll use random tensors for our inputs and targets. Let’s say our inputs are 200 vectors of size 100, which we group into one batch, and our targets are 200 random floats:</p>
+<div id="cell-93" class="cell">
+<div class="sourceCode cell-code" id="cb77"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb77-1"><a href="#cb77-1" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> torch.randn(<span class="dv">200</span>, <span class="dv">100</span>)</span>
+<span id="cb77-2"><a href="#cb77-2" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> torch.randn(<span class="dv">200</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>For our two-layer model we will need two weight matrices and two bias vectors. Let’s say we have a hidden size of 50 and the output size is 1 (for one of our inputs, the corresponding output is one float in this toy example). We initialize the weights randomly and the bias at zero:</p>
+<div id="cell-95" class="cell">
+<div class="sourceCode cell-code" id="cb78"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a>w1 <span class="op">=</span> torch.randn(<span class="dv">100</span>,<span class="dv">50</span>)</span>
+<span id="cb78-2"><a href="#cb78-2" aria-hidden="true" tabindex="-1"></a>b1 <span class="op">=</span> torch.zeros(<span class="dv">50</span>)</span>
+<span id="cb78-3"><a href="#cb78-3" aria-hidden="true" tabindex="-1"></a>w2 <span class="op">=</span> torch.randn(<span class="dv">50</span>,<span class="dv">1</span>)</span>
+<span id="cb78-4"><a href="#cb78-4" aria-hidden="true" tabindex="-1"></a>b2 <span class="op">=</span> torch.zeros(<span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Then the result of our first layer is simply:</p>
+<div id="cell-97" class="cell">
+<div class="sourceCode cell-code" id="cb79"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb79-1"><a href="#cb79-1" aria-hidden="true" tabindex="-1"></a>l1 <span class="op">=</span> lin(x, w1, b1)</span>
+<span id="cb79-2"><a href="#cb79-2" aria-hidden="true" tabindex="-1"></a>l1.shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>torch.Size([200, 50])</code></pre>
+</div>
+</div>
+<p>Note that this formula works with our batch of inputs, and returns a batch of hidden state: <code>l1</code> is a matrix of size 200 (our batch size) by 50 (our hidden size).</p>
+<p>There is a problem with the way our model was initialized, however. To understand it, we need to look at the mean and standard deviation (std) of <code>l1</code>:</p>
+<div id="cell-99" class="cell">
+<div class="sourceCode cell-code" id="cb81"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb81-1"><a href="#cb81-1" aria-hidden="true" tabindex="-1"></a>l1.mean(), l1.std()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>(tensor(0.1381), tensor(9.8549))</code></pre>
+</div>
+</div>
+<p>The mean is close to zero, which is understandable since both our input and weight matrices have means close to zero. But the standard deviation, which represents how far away our activations go from the mean, went from 1 to 10. This is a really big problem because that’s with just one layer. Modern neural nets can have hundred of layers, so if each of them multiplies the scale of our activations by 10, by the end of the last layer we won’t have numbers representable by a computer.</p>
+<p>Indeed, if we make just 50 multiplications between <code>x</code> and random matrices of size 100×100, we’ll have:</p>
+<div id="cell-101" class="cell">
+<div class="sourceCode cell-code" id="cb83"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb83-1"><a href="#cb83-1" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> torch.randn(<span class="dv">200</span>, <span class="dv">100</span>)</span>
+<span id="cb83-2"><a href="#cb83-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">50</span>): x <span class="op">=</span> x <span class="op">@</span> torch.randn(<span class="dv">100</span>,<span class="dv">100</span>)</span>
+<span id="cb83-3"><a href="#cb83-3" aria-hidden="true" tabindex="-1"></a>x[<span class="dv">0</span>:<span class="dv">5</span>,<span class="dv">0</span>:<span class="dv">5</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>tensor([[nan, nan, nan, nan, nan],
+        [nan, nan, nan, nan, nan],
+        [nan, nan, nan, nan, nan],
+        [nan, nan, nan, nan, nan],
+        [nan, nan, nan, nan, nan]])</code></pre>
+</div>
+</div>
+<p>The result is <code>nan</code>s everywhere. So maybe the scale of our matrix was too big, and we need to have smaller weights? But if we use too small weights, we will have the opposite problem—the scale of our activations will go from 1 to 0.1, and after 50 layers we’ll be left with zeros everywhere:</p>
+<div id="cell-103" class="cell">
+<div class="sourceCode cell-code" id="cb85"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb85-1"><a href="#cb85-1" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> torch.randn(<span class="dv">200</span>, <span class="dv">100</span>)</span>
+<span id="cb85-2"><a href="#cb85-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">50</span>): x <span class="op">=</span> x <span class="op">@</span> (torch.randn(<span class="dv">100</span>,<span class="dv">100</span>) <span class="op">*</span> <span class="fl">0.01</span>)</span>
+<span id="cb85-3"><a href="#cb85-3" aria-hidden="true" tabindex="-1"></a>x[<span class="dv">0</span>:<span class="dv">5</span>,<span class="dv">0</span>:<span class="dv">5</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>tensor([[0., 0., 0., 0., 0.],
+        [0., 0., 0., 0., 0.],
+        [0., 0., 0., 0., 0.],
+        [0., 0., 0., 0., 0.],
+        [0., 0., 0., 0., 0.]])</code></pre>
+</div>
+</div>
+<p>So we have to scale our weight matrices exactly right so that the standard deviation of our activations stays at 1. We can compute the exact value to use mathematically, as illustrated by Xavier Glorot and Yoshua Bengio in <a href="http://proceedings.mlr.press/v9/glorot10a/glorot10a.pdf">“Understanding the Difficulty of Training Deep Feedforward Neural Networks”</a>. The right scale for a given layer is <span class="math inline">\(1/\sqrt{n_{in}}\)</span>, where <span class="math inline">\(n_{in}\)</span> represents the number of inputs.</p>
+<p>In our case, if we have 100 inputs, we should scale our weight matrices by 0.1:</p>
+<div id="cell-105" class="cell">
+<div class="sourceCode cell-code" id="cb87"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb87-1"><a href="#cb87-1" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> torch.randn(<span class="dv">200</span>, <span class="dv">100</span>)</span>
+<span id="cb87-2"><a href="#cb87-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">50</span>): x <span class="op">=</span> x <span class="op">@</span> (torch.randn(<span class="dv">100</span>,<span class="dv">100</span>) <span class="op">*</span> <span class="fl">0.1</span>)</span>
+<span id="cb87-3"><a href="#cb87-3" aria-hidden="true" tabindex="-1"></a>x[<span class="dv">0</span>:<span class="dv">5</span>,<span class="dv">0</span>:<span class="dv">5</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>tensor([[-0.1769, -0.0389,  0.5414,  0.5769,  0.1272],
+        [ 0.2133, -1.1071,  0.8511, -1.2352, -0.6003],
+        [ 0.4065, -2.1840,  2.3958, -2.3253, -0.9688],
+        [ 0.1720,  1.2012, -2.4649, -0.7765,  0.7338],
+        [-0.0977,  1.4870, -2.0249,  1.0367,  0.8047]])</code></pre>
+</div>
+</div>
+<p>Finally some numbers that are neither zeros nor <code>nan</code>s! Notice how stable the scale of our activations is, even after those 50 fake layers:</p>
+<div id="cell-107" class="cell">
+<div class="sourceCode cell-code" id="cb89"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb89-1"><a href="#cb89-1" aria-hidden="true" tabindex="-1"></a>x.std()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>tensor(1.5285)</code></pre>
+</div>
+</div>
+<p>If you play a little bit with the value for scale you’ll notice that even a slight variation from 0.1 will get you either to very small or very large numbers, so initializing the weights properly is extremely important.</p>
+<p>Let’s go back to our neural net. Since we messed a bit with our inputs, we need to redefine them:</p>
+<div id="cell-109" class="cell">
+<div class="sourceCode cell-code" id="cb91"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb91-1"><a href="#cb91-1" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> torch.randn(<span class="dv">200</span>, <span class="dv">100</span>)</span>
+<span id="cb91-2"><a href="#cb91-2" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> torch.randn(<span class="dv">200</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>And for our weights, we’ll use the right scale, which is known as <em>Xavier initialization</em> (or <em>Glorot initialization</em>):</p>
+<div id="cell-111" class="cell">
+<div class="sourceCode cell-code" id="cb92"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb92-1"><a href="#cb92-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> math <span class="im">import</span> sqrt</span>
+<span id="cb92-2"><a href="#cb92-2" aria-hidden="true" tabindex="-1"></a>w1 <span class="op">=</span> torch.randn(<span class="dv">100</span>,<span class="dv">50</span>) <span class="op">/</span> sqrt(<span class="dv">100</span>)</span>
+<span id="cb92-3"><a href="#cb92-3" aria-hidden="true" tabindex="-1"></a>b1 <span class="op">=</span> torch.zeros(<span class="dv">50</span>)</span>
+<span id="cb92-4"><a href="#cb92-4" aria-hidden="true" tabindex="-1"></a>w2 <span class="op">=</span> torch.randn(<span class="dv">50</span>,<span class="dv">1</span>) <span class="op">/</span> sqrt(<span class="dv">50</span>)</span>
+<span id="cb92-5"><a href="#cb92-5" aria-hidden="true" tabindex="-1"></a>b2 <span class="op">=</span> torch.zeros(<span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now if we compute the result of the first layer, we can check that the mean and standard deviation are under control:</p>
+<div id="cell-113" class="cell">
+<div class="sourceCode cell-code" id="cb93"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb93-1"><a href="#cb93-1" aria-hidden="true" tabindex="-1"></a>l1 <span class="op">=</span> lin(x, w1, b1)</span>
+<span id="cb93-2"><a href="#cb93-2" aria-hidden="true" tabindex="-1"></a>l1.mean(),l1.std()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>(tensor(-0.0067), tensor(0.9904))</code></pre>
+</div>
+</div>
+<p>Very good. Now we need to go through a ReLU, so let’s define one. A ReLU removes the negatives and replaces them with zeros, which is another way of saying it clamps our tensor at zero:</p>
+<div id="cell-115" class="cell">
+<div class="sourceCode cell-code" id="cb95"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb95-1"><a href="#cb95-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> relu(x): <span class="cf">return</span> x.clamp_min(<span class="fl">0.</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We pass our activations through this:</p>
+<div id="cell-117" class="cell">
+<div class="sourceCode cell-code" id="cb96"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb96-1"><a href="#cb96-1" aria-hidden="true" tabindex="-1"></a>l2 <span class="op">=</span> relu(l1)</span>
+<span id="cb96-2"><a href="#cb96-2" aria-hidden="true" tabindex="-1"></a>l2.mean(),l2.std()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>(tensor(0.3906), tensor(0.5769))</code></pre>
+</div>
+</div>
+<p>And we’re back to square one: the mean of our activations has gone to 0.4 (which is understandable since we removed the negatives) and the std went down to 0.58. So like before, after a few layers we will probably wind up with zeros:</p>
+<div id="cell-119" class="cell">
+<div class="sourceCode cell-code" id="cb98"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb98-1"><a href="#cb98-1" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> torch.randn(<span class="dv">200</span>, <span class="dv">100</span>)</span>
+<span id="cb98-2"><a href="#cb98-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">50</span>): x <span class="op">=</span> relu(x <span class="op">@</span> (torch.randn(<span class="dv">100</span>,<span class="dv">100</span>) <span class="op">*</span> <span class="fl">0.1</span>))</span>
+<span id="cb98-3"><a href="#cb98-3" aria-hidden="true" tabindex="-1"></a>x[<span class="dv">0</span>:<span class="dv">5</span>,<span class="dv">0</span>:<span class="dv">5</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>tensor([[1.7712e-08, 0.0000e+00, 1.7827e-09, 0.0000e+00, 4.7123e-09],
+        [1.6280e-08, 0.0000e+00, 3.4217e-09, 0.0000e+00, 4.2597e-09],
+        [1.7071e-08, 0.0000e+00, 5.9012e-09, 0.0000e+00, 5.1323e-09],
+        [2.7019e-08, 0.0000e+00, 2.2739e-09, 0.0000e+00, 6.4754e-09],
+        [1.7600e-08, 0.0000e+00, 2.7536e-09, 0.0000e+00, 4.0279e-09]])</code></pre>
+</div>
+</div>
+<p>This means our initialization wasn’t right. Why? At the time Glorot and Bengio wrote their article, the popular activation in a neural net was the hyperbolic tangent (tanh, which is the one they used), and that initialization doesn’t account for our ReLU. Fortunately, someone else has done the math for us and computed the right scale for us to use. In <a href="https://arxiv.org/abs/1502.01852">“Delving Deep into Rectifiers: Surpassing Human-Level Performance”</a> (which we’ve seen before—it’s the article that introduced the ResNet), Kaiming He et al.&nbsp;show that we should use the following scale instead: <span class="math inline">\(\sqrt{2 / n_{in}}\)</span>, where <span class="math inline">\(n_{in}\)</span> is the number of inputs of our model. Let’s see what this gives us:</p>
+<div id="cell-121" class="cell">
+<div class="sourceCode cell-code" id="cb100"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb100-1"><a href="#cb100-1" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> torch.randn(<span class="dv">200</span>, <span class="dv">100</span>)</span>
+<span id="cb100-2"><a href="#cb100-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">50</span>): x <span class="op">=</span> relu(x <span class="op">@</span> (torch.randn(<span class="dv">100</span>,<span class="dv">100</span>) <span class="op">*</span> sqrt(<span class="dv">2</span><span class="op">/</span><span class="dv">100</span>)))</span>
+<span id="cb100-3"><a href="#cb100-3" aria-hidden="true" tabindex="-1"></a>x[<span class="dv">0</span>:<span class="dv">5</span>,<span class="dv">0</span>:<span class="dv">5</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>tensor([[0.2880, 0.2231, 0.0000, 1.4916, 2.1533],
+        [0.2511, 0.1750, 0.0000, 1.3327, 1.8034],
+        [0.2895, 0.1873, 0.0000, 0.8633, 1.2818],
+        [0.2071, 0.1811, 0.0000, 1.4611, 2.0061],
+        [0.4338, 0.3052, 0.0101, 1.4161, 2.0849]])</code></pre>
+</div>
+</div>
+<p>That’s better: our numbers aren’t all zeroed this time. So let’s go back to the definition of our neural net and use this initialization (which is named <em>Kaiming initialization</em> or <em>He initialization</em>):</p>
+<div id="cell-123" class="cell">
+<div class="sourceCode cell-code" id="cb102"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb102-1"><a href="#cb102-1" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> torch.randn(<span class="dv">200</span>, <span class="dv">100</span>)</span>
+<span id="cb102-2"><a href="#cb102-2" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> torch.randn(<span class="dv">200</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-124" class="cell">
+<div class="sourceCode cell-code" id="cb103"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb103-1"><a href="#cb103-1" aria-hidden="true" tabindex="-1"></a>w1 <span class="op">=</span> torch.randn(<span class="dv">100</span>,<span class="dv">50</span>) <span class="op">*</span> sqrt(<span class="dv">2</span> <span class="op">/</span> <span class="dv">100</span>)</span>
+<span id="cb103-2"><a href="#cb103-2" aria-hidden="true" tabindex="-1"></a>b1 <span class="op">=</span> torch.zeros(<span class="dv">50</span>)</span>
+<span id="cb103-3"><a href="#cb103-3" aria-hidden="true" tabindex="-1"></a>w2 <span class="op">=</span> torch.randn(<span class="dv">50</span>,<span class="dv">1</span>) <span class="op">*</span> sqrt(<span class="dv">2</span> <span class="op">/</span> <span class="dv">50</span>)</span>
+<span id="cb103-4"><a href="#cb103-4" aria-hidden="true" tabindex="-1"></a>b2 <span class="op">=</span> torch.zeros(<span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Let’s look at the scale of our activations after going through the first linear layer and ReLU:</p>
+<div id="cell-126" class="cell">
+<div class="sourceCode cell-code" id="cb104"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb104-1"><a href="#cb104-1" aria-hidden="true" tabindex="-1"></a>l1 <span class="op">=</span> lin(x, w1, b1)</span>
+<span id="cb104-2"><a href="#cb104-2" aria-hidden="true" tabindex="-1"></a>l2 <span class="op">=</span> relu(l1)</span>
+<span id="cb104-3"><a href="#cb104-3" aria-hidden="true" tabindex="-1"></a>l2.mean(), l2.std()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>(tensor(0.5656), tensor(0.8275))</code></pre>
+</div>
+</div>
+<p>Much better! Now that our weights are properly initialized, we can define our whole model:</p>
+<div id="cell-128" class="cell">
+<div class="sourceCode cell-code" id="cb106"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb106-1"><a href="#cb106-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> model(x):</span>
+<span id="cb106-2"><a href="#cb106-2" aria-hidden="true" tabindex="-1"></a>    l1 <span class="op">=</span> lin(x, w1, b1)</span>
+<span id="cb106-3"><a href="#cb106-3" aria-hidden="true" tabindex="-1"></a>    l2 <span class="op">=</span> relu(l1)</span>
+<span id="cb106-4"><a href="#cb106-4" aria-hidden="true" tabindex="-1"></a>    l3 <span class="op">=</span> lin(l2, w2, b2)</span>
+<span id="cb106-5"><a href="#cb106-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> l3</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>This is the forward pass. Now all that’s left to do is to compare our output to the labels we have (random numbers, in this example) with a loss function. In this case, we will use the mean squared error. (It’s a toy problem, and this is the easiest loss function to use for what is next, computing the gradients.)</p>
+<p>The only subtlety is that our outputs and targets don’t have exactly the same shape—after going though the model, we get an output like this:</p>
+<div id="cell-130" class="cell">
+<div class="sourceCode cell-code" id="cb107"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb107-1"><a href="#cb107-1" aria-hidden="true" tabindex="-1"></a>out <span class="op">=</span> model(x)</span>
+<span id="cb107-2"><a href="#cb107-2" aria-hidden="true" tabindex="-1"></a>out.shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>torch.Size([200, 1])</code></pre>
+</div>
+</div>
+<p>To get rid of this trailing 1 dimension, we use the <code>squeeze</code> function:</p>
+<div id="cell-132" class="cell">
+<div class="sourceCode cell-code" id="cb109"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb109-1"><a href="#cb109-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> mse(output, targ): <span class="cf">return</span> (output.squeeze(<span class="op">-</span><span class="dv">1</span>) <span class="op">-</span> targ).<span class="bu">pow</span>(<span class="dv">2</span>).mean()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>And now we are ready to compute our loss:</p>
+<div id="cell-134" class="cell">
+<div class="sourceCode cell-code" id="cb110"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb110-1"><a href="#cb110-1" aria-hidden="true" tabindex="-1"></a>loss <span class="op">=</span> mse(out, y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>That’s all for the forward pass—let’s now look at the gradients.</p>
+</section>
+<section id="gradients-and-the-backward-pass" class="level3">
+<h3 class="anchored" data-anchor-id="gradients-and-the-backward-pass">Gradients and the Backward Pass</h3>
+<p>We’ve seen that PyTorch computes all the gradients we need with a magic call to <code>loss.backward</code>, but let’s explore what’s happening behind the scenes.</p>
+<p>Now comes the part where we need to compute the gradients of the loss with respect to all the weights of our model, so all the floats in <code>w1</code>, <code>b1</code>, <code>w2</code>, and <code>b2</code>. For this, we will need a bit of math—specifically the <em>chain rule</em>. This is the rule of calculus that guides how we can compute the derivative of a composed function:</p>
+<p><span class="math display">\[(g \circ f)'(x) = g'(f(x)) f'(x)\]</span></p>
+<blockquote class="blockquote">
+<p>j: I find this notation very hard to wrap my head around, so instead I like to think of it as: if <code>y = g(u)</code> and <code>u=f(x)</code>; then <code>dy/dx = dy/du * du/dx</code>. The two notations mean the same thing, so use whatever works for you.</p>
+</blockquote>
+<p>Our loss is a big composition of different functions: mean squared error (which is in turn the composition of a mean and a power of two), the second linear layer, a ReLU and the first linear layer. For instance, if we want the gradients of the loss with respect to <code>b2</code> and our loss is defined by:</p>
+<pre><code>loss = mse(out,y) = mse(lin(l2, w2, b2), y)</code></pre>
+<p>The chain rule tells us that we have: <span class="math display">\[\frac{\text{d} loss}{\text{d} b_{2}} = \frac{\text{d} loss}{\text{d} out} \times \frac{\text{d} out}{\text{d} b_{2}} = \frac{\text{d}}{\text{d} out} mse(out, y) \times \frac{\text{d}}{\text{d} b_{2}} lin(l_{2}, w_{2}, b_{2})\]</span></p>
+<p>To compute the gradients of the loss with respect to <span class="math inline">\(b_{2}\)</span>, we first need the gradients of the loss with respect to our output <span class="math inline">\(out\)</span>. It’s the same if we want the gradients of the loss with respect to <span class="math inline">\(w_{2}\)</span>. Then, to get the gradients of the loss with respect to <span class="math inline">\(b_{1}\)</span> or <span class="math inline">\(w_{1}\)</span>, we will need the gradients of the loss with respect to <span class="math inline">\(l_{1}\)</span>, which in turn requires the gradients of the loss with respect to <span class="math inline">\(l_{2}\)</span>, which will need the gradients of the loss with respect to <span class="math inline">\(out\)</span>.</p>
+<p>So to compute all the gradients we need for the update, we need to begin from the output of the model and work our way <em>backward</em>, one layer after the other—which is why this step is known as <em>backpropagation</em>. We can automate it by having each function we implemented (<code>relu</code>, <code>mse</code>, <code>lin</code>) provide its backward step: that is, how to derive the gradients of the loss with respect to the input(s) from the gradients of the loss with respect to the output.</p>
+<p>Here we populate those gradients in an attribute of each tensor, a bit like PyTorch does with <code>.grad</code>.</p>
+<p>The first are the gradients of the loss with respect to the output of our model (which is the input of the loss function). We undo the <code>squeeze</code> we did in <code>mse</code>, then we use the formula that gives us the derivative of <span class="math inline">\(x^{2}\)</span>: <span class="math inline">\(2x\)</span>. The derivative of the mean is just <span class="math inline">\(1/n\)</span> where <span class="math inline">\(n\)</span> is the number of elements in our input:</p>
+<div id="cell-140" class="cell">
+<div class="sourceCode cell-code" id="cb112"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb112-1"><a href="#cb112-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> mse_grad(inp, targ): </span>
+<span id="cb112-2"><a href="#cb112-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># grad of loss with respect to output of previous layer</span></span>
+<span id="cb112-3"><a href="#cb112-3" aria-hidden="true" tabindex="-1"></a>    inp.g <span class="op">=</span> <span class="fl">2.</span> <span class="op">*</span> (inp.squeeze() <span class="op">-</span> targ).unsqueeze(<span class="op">-</span><span class="dv">1</span>) <span class="op">/</span> inp.shape[<span class="dv">0</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>For the gradients of the ReLU and our linear layer, we use the gradients of the loss with respect to the output (in <code>out.g</code>) and apply the chain rule to compute the gradients of the loss with respect to the input (in <code>inp.g</code>). The chain rule tells us that <code>inp.g = relu'(inp) * out.g</code>. The derivative of <code>relu</code> is either 0 (when inputs are negative) or 1 (when inputs are positive), so this gives us:</p>
+<div id="cell-142" class="cell">
+<div class="sourceCode cell-code" id="cb113"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb113-1"><a href="#cb113-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> relu_grad(inp, out):</span>
+<span id="cb113-2"><a href="#cb113-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># grad of relu with respect to input activations</span></span>
+<span id="cb113-3"><a href="#cb113-3" aria-hidden="true" tabindex="-1"></a>    inp.g <span class="op">=</span> (inp<span class="op">&gt;</span><span class="dv">0</span>).<span class="bu">float</span>() <span class="op">*</span> out.g</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The scheme is the same to compute the gradients of the loss with respect to the inputs, weights, and bias in the linear layer:</p>
+<div id="cell-144" class="cell">
+<div class="sourceCode cell-code" id="cb114"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb114-1"><a href="#cb114-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> lin_grad(inp, out, w, b):</span>
+<span id="cb114-2"><a href="#cb114-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># grad of matmul with respect to input</span></span>
+<span id="cb114-3"><a href="#cb114-3" aria-hidden="true" tabindex="-1"></a>    inp.g <span class="op">=</span> out.g <span class="op">@</span> w.t()</span>
+<span id="cb114-4"><a href="#cb114-4" aria-hidden="true" tabindex="-1"></a>    w.g <span class="op">=</span> inp.t() <span class="op">@</span> out.g</span>
+<span id="cb114-5"><a href="#cb114-5" aria-hidden="true" tabindex="-1"></a>    b.g <span class="op">=</span> out.g.<span class="bu">sum</span>(<span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We won’t linger on the mathematical formulas that define them since they’re not important for our purposes, but do check out Khan Academy’s excellent calculus lessons if you’re interested in this topic.</p>
+</section>
+<section id="sidebar-sympy" class="level3">
+<h3 class="anchored" data-anchor-id="sidebar-sympy">Sidebar: SymPy</h3>
+<p>SymPy is a library for symbolic computation that is extremely useful library when working with calculus. Per the <a href="https://docs.sympy.org/latest/tutorial/intro.html">documentation</a>:</p>
+<blockquote class="blockquote">
+<p>Symbolic computation deals with the computation of mathematical objects symbolically. This means that the mathematical objects are represented exactly, not approximately, and mathematical expressions with unevaluated variables are left in symbolic form.</p>
+</blockquote>
+<p>To do symbolic computation, we first define a <em>symbol</em>, and then do a computation, like so:</p>
+<div id="cell-150" class="cell">
+<div class="sourceCode cell-code" id="cb115"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb115-1"><a href="#cb115-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sympy <span class="im">import</span> symbols,diff</span>
+<span id="cb115-2"><a href="#cb115-2" aria-hidden="true" tabindex="-1"></a>sx,sy <span class="op">=</span> symbols(<span class="st">'sx sy'</span>)</span>
+<span id="cb115-3"><a href="#cb115-3" aria-hidden="true" tabindex="-1"></a>diff(sx<span class="op">**</span><span class="dv">2</span>, sx)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display cell-output-markdown">
+<p><span class="math inline">\(\displaystyle 2 sx\)</span></p>
+</div>
+</div>
+<p>Here, SymPy has taken the derivative of <code>x**2</code> for us! It can take the derivative of complicated compound expressions, simplify and factor equations, and much more. There’s really not much reason for anyone to do calculus manually nowadays—for calculating gradients, PyTorch does it for us, and for showing the equations, SymPy does it for us!</p>
+</section>
+<section id="end-sidebar" class="level3">
+<h3 class="anchored" data-anchor-id="end-sidebar">End sidebar</h3>
+<p>Once we have have defined those functions, we can use them to write the backward pass. Since each gradient is automatically populated in the right tensor, we don’t need to store the results of those <code>_grad</code> functions anywhere—we just need to execute them in the reverse order of the forward pass, to make sure that in each function <code>out.g</code> exists:</p>
+<div id="cell-154" class="cell">
+<div class="sourceCode cell-code" id="cb116"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb116-1"><a href="#cb116-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> forward_and_backward(inp, targ):</span>
+<span id="cb116-2"><a href="#cb116-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># forward pass:</span></span>
+<span id="cb116-3"><a href="#cb116-3" aria-hidden="true" tabindex="-1"></a>    l1 <span class="op">=</span> inp <span class="op">@</span> w1 <span class="op">+</span> b1</span>
+<span id="cb116-4"><a href="#cb116-4" aria-hidden="true" tabindex="-1"></a>    l2 <span class="op">=</span> relu(l1)</span>
+<span id="cb116-5"><a href="#cb116-5" aria-hidden="true" tabindex="-1"></a>    out <span class="op">=</span> l2 <span class="op">@</span> w2 <span class="op">+</span> b2</span>
+<span id="cb116-6"><a href="#cb116-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># we don't actually need the loss in backward!</span></span>
+<span id="cb116-7"><a href="#cb116-7" aria-hidden="true" tabindex="-1"></a>    loss <span class="op">=</span> mse(out, targ)</span>
+<span id="cb116-8"><a href="#cb116-8" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb116-9"><a href="#cb116-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># backward pass:</span></span>
+<span id="cb116-10"><a href="#cb116-10" aria-hidden="true" tabindex="-1"></a>    mse_grad(out, targ)</span>
+<span id="cb116-11"><a href="#cb116-11" aria-hidden="true" tabindex="-1"></a>    lin_grad(l2, out, w2, b2)</span>
+<span id="cb116-12"><a href="#cb116-12" aria-hidden="true" tabindex="-1"></a>    relu_grad(l1, l2)</span>
+<span id="cb116-13"><a href="#cb116-13" aria-hidden="true" tabindex="-1"></a>    lin_grad(inp, l1, w1, b1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>And now we can access the gradients of our model parameters in <code>w1.g</code>, <code>b1.g</code>, <code>w2.g</code>, and <code>b2.g</code>.</p>
+<p>We have successfully defined our model—now let’s make it a bit more like a PyTorch module.</p>
+</section>
+<section id="refactoring-the-model" class="level3">
+<h3 class="anchored" data-anchor-id="refactoring-the-model">Refactoring the Model</h3>
+<p>The three functions we used have two associated functions: a forward pass and a backward pass. Instead of writing them separately, we can create a class to wrap them together. That class can also store the inputs and outputs for the backward pass. This way, we will just have to call <code>backward</code>:</p>
+<div id="cell-159" class="cell">
+<div class="sourceCode cell-code" id="cb117"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb117-1"><a href="#cb117-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Relu():</span>
+<span id="cb117-2"><a href="#cb117-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__call__</span>(<span class="va">self</span>, inp):</span>
+<span id="cb117-3"><a href="#cb117-3" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.inp <span class="op">=</span> inp</span>
+<span id="cb117-4"><a href="#cb117-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.out <span class="op">=</span> inp.clamp_min(<span class="fl">0.</span>)</span>
+<span id="cb117-5"><a href="#cb117-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.out</span>
+<span id="cb117-6"><a href="#cb117-6" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb117-7"><a href="#cb117-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> backward(<span class="va">self</span>): <span class="va">self</span>.inp.g <span class="op">=</span> (<span class="va">self</span>.inp<span class="op">&gt;</span><span class="dv">0</span>).<span class="bu">float</span>() <span class="op">*</span> <span class="va">self</span>.out.g</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><code>__call__</code> is a magic name in Python that will make our class callable. This is what will be executed when we type <code>y = Relu()(x)</code>. We can do the same for our linear layer and the MSE loss:</p>
+<div id="cell-161" class="cell">
+<div class="sourceCode cell-code" id="cb118"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb118-1"><a href="#cb118-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Lin():</span>
+<span id="cb118-2"><a href="#cb118-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, w, b): <span class="va">self</span>.w,<span class="va">self</span>.b <span class="op">=</span> w,b</span>
+<span id="cb118-3"><a href="#cb118-3" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb118-4"><a href="#cb118-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__call__</span>(<span class="va">self</span>, inp):</span>
+<span id="cb118-5"><a href="#cb118-5" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.inp <span class="op">=</span> inp</span>
+<span id="cb118-6"><a href="#cb118-6" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.out <span class="op">=</span> inp<span class="op">@</span>self.w <span class="op">+</span> <span class="va">self</span>.b</span>
+<span id="cb118-7"><a href="#cb118-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.out</span>
+<span id="cb118-8"><a href="#cb118-8" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb118-9"><a href="#cb118-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> backward(<span class="va">self</span>):</span>
+<span id="cb118-10"><a href="#cb118-10" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.inp.g <span class="op">=</span> <span class="va">self</span>.out.g <span class="op">@</span> <span class="va">self</span>.w.t()</span>
+<span id="cb118-11"><a href="#cb118-11" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.w.g <span class="op">=</span> <span class="va">self</span>.inp.t() <span class="op">@</span> <span class="va">self</span>.out.g</span>
+<span id="cb118-12"><a href="#cb118-12" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.b.g <span class="op">=</span> <span class="va">self</span>.out.g.<span class="bu">sum</span>(<span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-162" class="cell">
+<div class="sourceCode cell-code" id="cb119"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb119-1"><a href="#cb119-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Mse():</span>
+<span id="cb119-2"><a href="#cb119-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__call__</span>(<span class="va">self</span>, inp, targ):</span>
+<span id="cb119-3"><a href="#cb119-3" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.inp <span class="op">=</span> inp</span>
+<span id="cb119-4"><a href="#cb119-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.targ <span class="op">=</span> targ</span>
+<span id="cb119-5"><a href="#cb119-5" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.out <span class="op">=</span> (inp.squeeze() <span class="op">-</span> targ).<span class="bu">pow</span>(<span class="dv">2</span>).mean()</span>
+<span id="cb119-6"><a href="#cb119-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.out</span>
+<span id="cb119-7"><a href="#cb119-7" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb119-8"><a href="#cb119-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> backward(<span class="va">self</span>):</span>
+<span id="cb119-9"><a href="#cb119-9" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> (<span class="va">self</span>.inp.squeeze()<span class="op">-</span><span class="va">self</span>.targ).unsqueeze(<span class="op">-</span><span class="dv">1</span>)</span>
+<span id="cb119-10"><a href="#cb119-10" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.inp.g <span class="op">=</span> <span class="fl">2.</span><span class="op">*</span>x<span class="op">/</span><span class="va">self</span>.targ.shape[<span class="dv">0</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Then we can put everything in a model that we initiate with our tensors <code>w1</code>, <code>b1</code>, <code>w2</code>, <code>b2</code>:</p>
+<div id="cell-164" class="cell">
+<div class="sourceCode cell-code" id="cb120"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb120-1"><a href="#cb120-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Model():</span>
+<span id="cb120-2"><a href="#cb120-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, w1, b1, w2, b2):</span>
+<span id="cb120-3"><a href="#cb120-3" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.layers <span class="op">=</span> [Lin(w1,b1), Relu(), Lin(w2,b2)]</span>
+<span id="cb120-4"><a href="#cb120-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.loss <span class="op">=</span> Mse()</span>
+<span id="cb120-5"><a href="#cb120-5" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb120-6"><a href="#cb120-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__call__</span>(<span class="va">self</span>, x, targ):</span>
+<span id="cb120-7"><a href="#cb120-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> l <span class="kw">in</span> <span class="va">self</span>.layers: x <span class="op">=</span> l(x)</span>
+<span id="cb120-8"><a href="#cb120-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.loss(x, targ)</span>
+<span id="cb120-9"><a href="#cb120-9" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb120-10"><a href="#cb120-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> backward(<span class="va">self</span>):</span>
+<span id="cb120-11"><a href="#cb120-11" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.loss.backward()</span>
+<span id="cb120-12"><a href="#cb120-12" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> l <span class="kw">in</span> <span class="bu">reversed</span>(<span class="va">self</span>.layers): l.backward()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>What is really nice about this refactoring and registering things as layers of our model is that the forward and backward passes are now really easy to write. If we want to instantiate our model, we just need to write:</p>
+<div id="cell-166" class="cell">
+<div class="sourceCode cell-code" id="cb121"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb121-1"><a href="#cb121-1" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> Model(w1, b1, w2, b2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The forward pass can then be executed with:</p>
+<div id="cell-168" class="cell">
+<div class="sourceCode cell-code" id="cb122"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb122-1"><a href="#cb122-1" aria-hidden="true" tabindex="-1"></a>loss <span class="op">=</span> model(x, y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>And the backward pass with:</p>
+<div id="cell-170" class="cell">
+<div class="sourceCode cell-code" id="cb123"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb123-1"><a href="#cb123-1" aria-hidden="true" tabindex="-1"></a>model.backward()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="going-to-pytorch" class="level3">
+<h3 class="anchored" data-anchor-id="going-to-pytorch">Going to PyTorch</h3>
+<p>The <code>Lin</code>, <code>Mse</code> and <code>Relu</code> classes we wrote have a lot in common, so we could make them all inherit from the same base class:</p>
+<div id="cell-173" class="cell">
+<div class="sourceCode cell-code" id="cb124"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb124-1"><a href="#cb124-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> LayerFunction():</span>
+<span id="cb124-2"><a href="#cb124-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__call__</span>(<span class="va">self</span>, <span class="op">*</span>args):</span>
+<span id="cb124-3"><a href="#cb124-3" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.args <span class="op">=</span> args</span>
+<span id="cb124-4"><a href="#cb124-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.out <span class="op">=</span> <span class="va">self</span>.forward(<span class="op">*</span>args)</span>
+<span id="cb124-5"><a href="#cb124-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.out</span>
+<span id="cb124-6"><a href="#cb124-6" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb124-7"><a href="#cb124-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>):  <span class="cf">raise</span> <span class="pp">Exception</span>(<span class="st">'not implemented'</span>)</span>
+<span id="cb124-8"><a href="#cb124-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> bwd(<span class="va">self</span>):      <span class="cf">raise</span> <span class="pp">Exception</span>(<span class="st">'not implemented'</span>)</span>
+<span id="cb124-9"><a href="#cb124-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> backward(<span class="va">self</span>): <span class="va">self</span>.bwd(<span class="va">self</span>.out, <span class="op">*</span><span class="va">self</span>.args)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Then we just need to implement <code>forward</code> and <code>bwd</code> in each of our subclasses:</p>
+<div id="cell-175" class="cell">
+<div class="sourceCode cell-code" id="cb125"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb125-1"><a href="#cb125-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Relu(LayerFunction):</span>
+<span id="cb125-2"><a href="#cb125-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, inp): <span class="cf">return</span> inp.clamp_min(<span class="fl">0.</span>)</span>
+<span id="cb125-3"><a href="#cb125-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> bwd(<span class="va">self</span>, out, inp): inp.g <span class="op">=</span> (inp<span class="op">&gt;</span><span class="dv">0</span>).<span class="bu">float</span>() <span class="op">*</span> out.g</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-176" class="cell">
+<div class="sourceCode cell-code" id="cb126"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb126-1"><a href="#cb126-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Lin(LayerFunction):</span>
+<span id="cb126-2"><a href="#cb126-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, w, b): <span class="va">self</span>.w,<span class="va">self</span>.b <span class="op">=</span> w,b</span>
+<span id="cb126-3"><a href="#cb126-3" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb126-4"><a href="#cb126-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, inp): <span class="cf">return</span> inp<span class="op">@</span>self.w <span class="op">+</span> <span class="va">self</span>.b</span>
+<span id="cb126-5"><a href="#cb126-5" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb126-6"><a href="#cb126-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> bwd(<span class="va">self</span>, out, inp):</span>
+<span id="cb126-7"><a href="#cb126-7" aria-hidden="true" tabindex="-1"></a>        inp.g <span class="op">=</span> out.g <span class="op">@</span> <span class="va">self</span>.w.t()</span>
+<span id="cb126-8"><a href="#cb126-8" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.w.g <span class="op">=</span> inp.t() <span class="op">@</span> <span class="va">self</span>.out.g</span>
+<span id="cb126-9"><a href="#cb126-9" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.b.g <span class="op">=</span> out.g.<span class="bu">sum</span>(<span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-177" class="cell">
+<div class="sourceCode cell-code" id="cb127"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb127-1"><a href="#cb127-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Mse(LayerFunction):</span>
+<span id="cb127-2"><a href="#cb127-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward (<span class="va">self</span>, inp, targ): <span class="cf">return</span> (inp.squeeze() <span class="op">-</span> targ).<span class="bu">pow</span>(<span class="dv">2</span>).mean()</span>
+<span id="cb127-3"><a href="#cb127-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> bwd(<span class="va">self</span>, out, inp, targ): </span>
+<span id="cb127-4"><a href="#cb127-4" aria-hidden="true" tabindex="-1"></a>        inp.g <span class="op">=</span> <span class="dv">2</span><span class="op">*</span>(inp.squeeze()<span class="op">-</span>targ).unsqueeze(<span class="op">-</span><span class="dv">1</span>) <span class="op">/</span> targ.shape[<span class="dv">0</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The rest of our model can be the same as before. This is getting closer and closer to what PyTorch does. Each basic function we need to differentiate is written as a <code>torch.autograd.Function</code> object that has a <code>forward</code> and a <code>backward</code> method. PyTorch will then keep trace of any computation we do to be able to properly run the backward pass, unless we set the <code>requires_grad</code> attribute of our tensors to <code>False</code>.</p>
+<p>Writing one of these is (almost) as easy as writing our original classes. The difference is that we choose what to save and what to put in a context variable (so that we make sure we don’t save anything we don’t need), and we return the gradients in the <code>backward</code> pass. It’s very rare to have to write your own <code>Function</code> but if you ever need something exotic or want to mess with the gradients of a regular function, here is how to write one:</p>
+<div id="cell-179" class="cell">
+<div class="sourceCode cell-code" id="cb128"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb128-1"><a href="#cb128-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> torch.autograd <span class="im">import</span> Function</span>
+<span id="cb128-2"><a href="#cb128-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb128-3"><a href="#cb128-3" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> MyRelu(Function):</span>
+<span id="cb128-4"><a href="#cb128-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">@staticmethod</span></span>
+<span id="cb128-5"><a href="#cb128-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(ctx, i):</span>
+<span id="cb128-6"><a href="#cb128-6" aria-hidden="true" tabindex="-1"></a>        result <span class="op">=</span> i.clamp_min(<span class="fl">0.</span>)</span>
+<span id="cb128-7"><a href="#cb128-7" aria-hidden="true" tabindex="-1"></a>        ctx.save_for_backward(i)</span>
+<span id="cb128-8"><a href="#cb128-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> result</span>
+<span id="cb128-9"><a href="#cb128-9" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb128-10"><a href="#cb128-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">@staticmethod</span></span>
+<span id="cb128-11"><a href="#cb128-11" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> backward(ctx, grad_output):</span>
+<span id="cb128-12"><a href="#cb128-12" aria-hidden="true" tabindex="-1"></a>        i, <span class="op">=</span> ctx.saved_tensors</span>
+<span id="cb128-13"><a href="#cb128-13" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> grad_output <span class="op">*</span> (i<span class="op">&gt;</span><span class="dv">0</span>).<span class="bu">float</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The structure used to build a more complex model that takes advantage of those <code>Function</code>s is a <code>torch.nn.Module</code>. This is the base structure for all models, and all the neural nets you have seen up until now inherited from that class. It mostly helps to register all the trainable parameters, which as we’ve seen can be used in the training loop.</p>
+<p>To implement an <code>nn.Module</code> you just need to:</p>
+<ul>
+<li>Make sure the superclass <code>__init__</code> is called first when you initialize it.</li>
+<li>Define any parameters of the model as attributes with <code>nn.Parameter</code>.</li>
+<li>Define a <code>forward</code> function that returns the output of your model.</li>
+</ul>
+<p>As an example, here is the linear layer from scratch:</p>
+<div id="cell-181" class="cell">
+<div class="sourceCode cell-code" id="cb129"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb129-1"><a href="#cb129-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch.nn <span class="im">as</span> nn</span>
+<span id="cb129-2"><a href="#cb129-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb129-3"><a href="#cb129-3" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> LinearLayer(nn.Module):</span>
+<span id="cb129-4"><a href="#cb129-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, n_in, n_out):</span>
+<span id="cb129-5"><a href="#cb129-5" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>()</span>
+<span id="cb129-6"><a href="#cb129-6" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.weight <span class="op">=</span> nn.Parameter(torch.randn(n_out, n_in) <span class="op">*</span> sqrt(<span class="dv">2</span><span class="op">/</span>n_in))</span>
+<span id="cb129-7"><a href="#cb129-7" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.bias <span class="op">=</span> nn.Parameter(torch.zeros(n_out))</span>
+<span id="cb129-8"><a href="#cb129-8" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb129-9"><a href="#cb129-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, x): <span class="cf">return</span> x <span class="op">@</span> <span class="va">self</span>.weight.t() <span class="op">+</span> <span class="va">self</span>.bias</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>As you see, this class automatically keeps track of what parameters have been defined:</p>
+<div id="cell-183" class="cell">
+<div class="sourceCode cell-code" id="cb130"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb130-1"><a href="#cb130-1" aria-hidden="true" tabindex="-1"></a>lin <span class="op">=</span> LinearLayer(<span class="dv">10</span>,<span class="dv">2</span>)</span>
+<span id="cb130-2"><a href="#cb130-2" aria-hidden="true" tabindex="-1"></a>p1,p2 <span class="op">=</span> lin.parameters()</span>
+<span id="cb130-3"><a href="#cb130-3" aria-hidden="true" tabindex="-1"></a>p1.shape,p2.shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>(torch.Size([2, 10]), torch.Size([2]))</code></pre>
+</div>
+</div>
+<p>It is thanks to this feature of <code>nn.Module</code> that we can just say <code>opt.step()</code> and have an optimizer loop through the parameters and update each one.</p>
+<p>Note that in PyTorch, the weights are stored as an <code>n_out x n_in</code> matrix, which is why we have the transpose in the forward pass.</p>
+<p>By using the linear layer from PyTorch (which uses the Kaiming initialization as well), the model we have been building up during this chapter can be written like this:</p>
+<div id="cell-185" class="cell">
+<div class="sourceCode cell-code" id="cb132"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb132-1"><a href="#cb132-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Model(nn.Module):</span>
+<span id="cb132-2"><a href="#cb132-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, n_in, nh, n_out):</span>
+<span id="cb132-3"><a href="#cb132-3" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>()</span>
+<span id="cb132-4"><a href="#cb132-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.layers <span class="op">=</span> nn.Sequential(</span>
+<span id="cb132-5"><a href="#cb132-5" aria-hidden="true" tabindex="-1"></a>            nn.Linear(n_in,nh), nn.ReLU(), nn.Linear(nh,n_out))</span>
+<span id="cb132-6"><a href="#cb132-6" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.loss <span class="op">=</span> mse</span>
+<span id="cb132-7"><a href="#cb132-7" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb132-8"><a href="#cb132-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, x, targ): <span class="cf">return</span> <span class="va">self</span>.loss(<span class="va">self</span>.layers(x).squeeze(), targ)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>In the last chapter, we will start from such a model and see how to build a training loop from scratch and refactor it to what we’ve been using in previous chapters.</p>
+</section>
+</section>
+<section id="conclusion" class="level2" data-number="17.3">
+<h2 data-number="17.3" class="anchored" data-anchor-id="conclusion"><span class="header-section-number">17.3</span> Conclusion</h2>
+<p>In this chapter we explored the foundations of deep learning, beginning with matrix multiplication and moving on to implementing the forward and backward passes of a neural net from scratch. We then refactored our code to show how PyTorch works beneath the hood.</p>
+<p>Here are a few things to remember:</p>
+<ul>
+<li>A neural net is basically a bunch of matrix multiplications with nonlinearities in between.</li>
+<li>Python is slow, so to write fast code we have to vectorize it and take advantage of techniques such as elementwise arithmetic and broadcasting.</li>
+<li>Two tensors are broadcastable if the dimensions starting from the end and going backward match (if they are the same, or one of them is 1). To make tensors broadcastable, we may need to add dimensions of size 1 with <code>unsqueeze</code> or a <code>None</code> index.</li>
+<li>Properly initializing a neural net is crucial to get training started. Kaiming initialization should be used when we have ReLU nonlinearities.</li>
+<li>The backward pass is the chain rule applied multiple times, computing the gradients from the output of our model and going back, one layer at a time.</li>
+<li>When subclassing <code>nn.Module</code> (if not using fastai’s <code>Module</code>) we have to call the superclass <code>__init__</code> method in our <code>__init__</code> method and we have to define a <code>forward</code> function that takes an input and returns the desired result.</li>
+</ul>
+</section>
+<section id="questionnaire" class="level2" data-number="17.4">
+<h2 data-number="17.4" class="anchored" data-anchor-id="questionnaire"><span class="header-section-number">17.4</span> Questionnaire</h2>
+<ol type="1">
+<li>Write the Python code to implement a single neuron.</li>
+<li>Write the Python code to implement ReLU.</li>
+<li>Write the Python code for a dense layer in terms of matrix multiplication.</li>
+<li>Write the Python code for a dense layer in plain Python (that is, with list comprehensions and functionality built into Python).</li>
+<li>What is the “hidden size” of a layer?</li>
+<li>What does the <code>t</code> method do in PyTorch?</li>
+<li>Why is matrix multiplication written in plain Python very slow?</li>
+<li>In <code>matmul</code>, why is <code>ac==br</code>?</li>
+<li>In Jupyter Notebook, how do you measure the time taken for a single cell to execute?</li>
+<li>What is “elementwise arithmetic”?</li>
+<li>Write the PyTorch code to test whether every element of <code>a</code> is greater than the corresponding element of <code>b</code>.</li>
+<li>What is a rank-0 tensor? How do you convert it to a plain Python data type?</li>
+<li>What does this return, and why? <code>tensor([1,2]) + tensor([1])</code></li>
+<li>What does this return, and why? <code>tensor([1,2]) + tensor([1,2,3])</code></li>
+<li>How does elementwise arithmetic help us speed up <code>matmul</code>?</li>
+<li>What are the broadcasting rules?</li>
+<li>What is <code>expand_as</code>? Show an example of how it can be used to match the results of broadcasting.</li>
+<li>How does <code>unsqueeze</code> help us to solve certain broadcasting problems?</li>
+<li>How can we use indexing to do the same operation as <code>unsqueeze</code>?</li>
+<li>How do we show the actual contents of the memory used for a tensor?</li>
+<li>When adding a vector of size 3 to a matrix of size 3×3, are the elements of the vector added to each row or each column of the matrix? (Be sure to check your answer by running this code in a notebook.)</li>
+<li>Do broadcasting and <code>expand_as</code> result in increased memory use? Why or why not?</li>
+<li>Implement <code>matmul</code> using Einstein summation.</li>
+<li>What does a repeated index letter represent on the left-hand side of einsum?</li>
+<li>What are the three rules of Einstein summation notation? Why?</li>
+<li>What are the forward pass and backward pass of a neural network?</li>
+<li>Why do we need to store some of the activations calculated for intermediate layers in the forward pass?</li>
+<li>What is the downside of having activations with a standard deviation too far away from 1?</li>
+<li>How can weight initialization help avoid this problem?</li>
+<li>What is the formula to initialize weights such that we get a standard deviation of 1 for a plain linear layer, and for a linear layer followed by ReLU?</li>
+<li>Why do we sometimes have to use the <code>squeeze</code> method in loss functions?</li>
+<li>What does the argument to the <code>squeeze</code> method do? Why might it be important to include this argument, even though PyTorch does not require it?</li>
+<li>What is the “chain rule”? Show the equation in either of the two forms presented in this chapter.</li>
+<li>Show how to calculate the gradients of <code>mse(lin(l2, w2, b2), y)</code> using the chain rule.</li>
+<li>What is the gradient of ReLU? Show it in math or code. (You shouldn’t need to commit this to memory—try to figure it using your knowledge of the shape of the function.)</li>
+<li>In what order do we need to call the <code>*_grad</code> functions in the backward pass? Why?</li>
+<li>What is <code>__call__</code>?</li>
+<li>What methods must we implement when writing a <code>torch.autograd.Function</code>?</li>
+<li>Write <code>nn.Linear</code> from scratch, and test it works.</li>
+<li>What is the difference between <code>nn.Module</code> and fastai’s <code>Module</code>?</li>
+</ol>
+<section id="further-research" class="level3">
+<h3 class="anchored" data-anchor-id="further-research">Further Research</h3>
+<ol type="1">
+<li>Implement ReLU as a <code>torch.autograd.Function</code> and train a model with it.</li>
+<li>If you are mathematically inclined, find out what the gradients of a linear layer are in mathematical notation. Map that to the implementation we saw in this chapter.</li>
+<li>Learn about the <code>unfold</code> method in PyTorch, and use it along with matrix multiplication to implement your own 2D convolution function. Then train a CNN that uses it.</li>
+<li>Implement everything in this chapter using NumPy instead of PyTorch.</li>
+</ol>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/fastai\.github\.io\/fastbook2e");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./accel_sgd.html" class="pagination-link" aria-label="The Training Process">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">The Training Process</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./book18.html" class="pagination-link" aria-label="*CNN Interpretation with CAM*">
+        <span class="nav-page-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title"><em>CNN Interpretation with CAM</em></span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

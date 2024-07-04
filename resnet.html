@@ -1,0 +1,1521 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.1">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>14&nbsp; ResNets – Practical Deep Learning for Coders</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./book15.html" rel="next">
+<link href="./convolutions.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+<link rel="stylesheet" href="styles.css">
+<meta property="og:title" content="14&nbsp; ResNets – Practical Deep Learning for Coders">
+<meta property="og:description" content="">
+<meta property="og:image" content="https://fastai.github.io/fastbook2e/images/att_00043.png">
+<meta property="og:site_name" content="Practical Deep Learning for Coders">
+<meta property="og:image:height" content="387">
+<meta property="og:image:width" content="663">
+<meta name="twitter:title" content="14&nbsp; ResNets – Practical Deep Learning for Coders">
+<meta name="twitter:description" content="">
+<meta name="twitter:image" content="https://fastai.github.io/fastbook2e/images/att_00043.png">
+<meta name="twitter:creator" content="jeremyphoward">
+<meta name="twitter:site" content="fastdotai">
+<meta name="twitter:image-height" content="387">
+<meta name="twitter:image-width" content="663">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./book11.html">From the Foundations</a></li><li class="breadcrumb-item"><a href="./resnet.html"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">ResNets</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Practical Deep Learning for Coders</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Getting Started</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./intro.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Your Deep Learning Journey</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./book2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title"><em>From Model to Production</em></span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./book3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">AI and Data Ethics</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">The Details</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mnist_basics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Under the Hood: Training a Digit Classifier</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./book5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title"><em>Image Classification</em></span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./book6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title"><em>Other Computer Vision Problems</em></span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./book7.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title"><em>Training a State-of-the-Art Model</em></span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./book8.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title"><em>Collaborative Filtering Deep Dive</em></span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./book9.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title"><em>Tabular Modeling Deep Dive</em></span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./book10.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title"><em>NLP Deep Dive: RNNs</em></span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">From the Foundations</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./book11.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title"><em>Data Munging with fastai’s Mid-Level API</em></span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./book12.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title"><em>A Language Model from Scratch</em></span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./convolutions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Convolutional Neural Networks</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./resnet.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">ResNets</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./book15.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title"><em>Application Architectures Deep Dive</em></span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./accel_sgd.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">The Training Process</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./foundations.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">A Neural Net from the Foundations</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./book18.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title"><em>CNN Interpretation with CAM</em></span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./book19.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title"><em>A fastai Learner from Scratch</em></span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./book20.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title"><em>Concluding Thoughts</em></span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#going-back-to-imagenette" id="toc-going-back-to-imagenette" class="nav-link active" data-scroll-target="#going-back-to-imagenette"><span class="header-section-number">14.1</span> Going Back to Imagenette</a></li>
+  <li><a href="#building-a-modern-cnn-resnet" id="toc-building-a-modern-cnn-resnet" class="nav-link" data-scroll-target="#building-a-modern-cnn-resnet"><span class="header-section-number">14.2</span> Building a Modern CNN: ResNet</a>
+  <ul class="collapse">
+  <li><a href="#skip-connections" id="toc-skip-connections" class="nav-link" data-scroll-target="#skip-connections">Skip Connections</a></li>
+  <li><a href="#a-state-of-the-art-resnet" id="toc-a-state-of-the-art-resnet" class="nav-link" data-scroll-target="#a-state-of-the-art-resnet">A State-of-the-Art ResNet</a></li>
+  <li><a href="#bottleneck-layers" id="toc-bottleneck-layers" class="nav-link" data-scroll-target="#bottleneck-layers">Bottleneck Layers</a></li>
+  </ul></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion"><span class="header-section-number">14.3</span> Conclusion</a></li>
+  <li><a href="#questionnaire" id="toc-questionnaire" class="nav-link" data-scroll-target="#questionnaire"><span class="header-section-number">14.4</span> Questionnaire</a>
+  <ul class="collapse">
+  <li><a href="#further-research" id="toc-further-research" class="nav-link" data-scroll-target="#further-research">Further Research</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./book11.html">From the Foundations</a></li><li class="breadcrumb-item"><a href="./resnet.html"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">ResNets</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span id="sec-resnet" class="quarto-section-identifier"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">ResNets</span></span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>In this chapter, we will build on top of the CNNs introduced in the previous chapter and explain to you the ResNet (residual network) architecture. It was introduced in 2015 by Kaiming He et al.&nbsp;in the article <a href="https://arxiv.org/abs/1512.03385">“Deep Residual Learning for Image Recognition”</a> and is by far the most used model architecture nowadays. More recent developments in image models almost always use the same trick of residual connections, and most of the time, they are just a tweak of the original ResNet.</p>
+<p>We will first show you the basic ResNet as it was first designed, then explain to you what modern tweaks make it more performant. But first, we will need a problem a little bit more difficult than the MNIST dataset, since we are already close to 100% accuracy with a regular CNN on it.</p>
+<section id="going-back-to-imagenette" class="level2" data-number="14.1">
+<h2 data-number="14.1" class="anchored" data-anchor-id="going-back-to-imagenette"><span class="header-section-number">14.1</span> Going Back to Imagenette</h2>
+<p>It’s going to be tough to judge any improvements we make to our models when we are already at an accuracy that is as high as we saw on MNIST in the previous chapter, so we will tackle a tougher image classification problem by going back to Imagenette. We’ll stick with small images to keep things reasonably fast.</p>
+<p>Let’s grab the data—we’ll use the already-resized 160 px version to make things faster still, and will random crop to 128 px:</p>
+<div id="cell-6" class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_data(url, presize, resize):</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    path <span class="op">=</span> untar_data(url)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> DataBlock(</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>        blocks<span class="op">=</span>(ImageBlock, CategoryBlock), get_items<span class="op">=</span>get_image_files, </span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>        splitter<span class="op">=</span>GrandparentSplitter(valid_name<span class="op">=</span><span class="st">'val'</span>),</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>        get_y<span class="op">=</span>parent_label, item_tfms<span class="op">=</span>Resize(presize),</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>        batch_tfms<span class="op">=</span>[<span class="op">*</span>aug_transforms(min_scale<span class="op">=</span><span class="fl">0.5</span>, size<span class="op">=</span>resize),</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>                    Normalize.from_stats(<span class="op">*</span>imagenet_stats)],</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    ).dataloaders(path, bs<span class="op">=</span><span class="dv">128</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-7" class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>dls <span class="op">=</span> get_data(URLs.IMAGENETTE_160, <span class="dv">160</span>, <span class="dv">128</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-8" class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>dls.show_batch(max_n<span class="op">=</span><span class="dv">4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="resnet_files/figure-html/cell-6-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>When we looked at MNIST we were dealing with 28×28-pixel images. For Imagenette we are going to be training with 128×128-pixel images. Later, we would like to be able to use larger images as well—at least as big as 224×224 pixels, the ImageNet standard. Do you recall how we managed to get a single vector of activations for each image out of the MNIST convolutional neural network?</p>
+<p>The approach we used was to ensure that there were enough stride-2 convolutions such that the final layer would have a grid size of 1. Then we just flattened out the unit axes that we ended up with, to get a vector for each image (so, a matrix of activations for a mini-batch). We could do the same thing for Imagenette, but that would cause two problems:</p>
+<ul>
+<li>We’d need lots of stride-2 layers to make our grid 1×1 at the end—perhaps more than we would otherwise choose.</li>
+<li>The model would not work on images of any size other than the size we originally trained on.</li>
+</ul>
+<p>One approach to dealing with the first of these issues would be to flatten the final convolutional layer in a way that handles a grid size other than 1×1. That is, we could simply flatten a matrix into a vector as we have done before, by laying out each row after the previous row. In fact, this is the approach that convolutional neural networks up until 2013 nearly always took. The most famous example is the 2013 ImageNet winner VGG, still sometimes used today. But there was another problem with this architecture: not only did it not work with images other than those of the same size used in the training set, but it required a lot of memory, because flattening out the convolutional layer resulted in many activations being fed into the final layers. Therefore, the weight matrices of the final layers were enormous.</p>
+<p>This problem was solved through the creation of <em>fully convolutional networks</em>. The trick in fully convolutional networks is to take the average of activations across a convolutional grid. In other words, we can simply use this function:</p>
+<div id="cell-10" class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> avg_pool(x): <span class="cf">return</span> x.mean((<span class="dv">2</span>,<span class="dv">3</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>As you see, it is taking the mean over the x- and y-axes. This function will always convert a grid of activations into a single activation per image. PyTorch provides a slightly more versatile module called <code>nn.AdaptiveAvgPool2d</code>, which averages a grid of activations into whatever sized destination you require (although we nearly always use a size of 1).</p>
+<p>A fully convolutional network, therefore, has a number of convolutional layers, some of which will be stride 2, at the end of which is an adaptive average pooling layer, a flatten layer to remove the unit axes, and finally a linear layer. Here is our first fully convolutional network:</p>
+<div id="cell-12" class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> block(ni, nf): <span class="cf">return</span> ConvLayer(ni, nf, stride<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_model():</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> nn.Sequential(</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>        block(<span class="dv">3</span>, <span class="dv">16</span>),</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>        block(<span class="dv">16</span>, <span class="dv">32</span>),</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>        block(<span class="dv">32</span>, <span class="dv">64</span>),</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>        block(<span class="dv">64</span>, <span class="dv">128</span>),</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>        block(<span class="dv">128</span>, <span class="dv">256</span>),</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>        nn.AdaptiveAvgPool2d(<span class="dv">1</span>),</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>        Flatten(),</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>        nn.Linear(<span class="dv">256</span>, dls.c))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We’re going to be replacing the implementation of <code>block</code> in the network with other variants in a moment, which is why we’re not calling it <code>conv</code> any more. We’re also saving some time by taking advantage of fastai’s <code>ConvLayer</code>, which that already provides the functionality of <code>conv</code> from the last chapter (plus a lot more!).</p>
+<blockquote class="blockquote">
+<p>stop: Consider this question: would this approach makes sense for an optical character recognition (OCR) problem such as MNIST? The vast majority of practitioners tackling OCR and similar problems tend to use fully convolutional networks, because that’s what nearly everybody learns nowadays. But it really doesn’t make any sense! You can’t decide, for instance, whether a number is a 3 or an 8 by slicing it into small pieces, jumbling them up, and deciding whether on average each piece looks like a 3 or an 8. But that’s what adaptive average pooling effectively does! Fully convolutional networks are only really a good choice for objects that don’t have a single correct orientation or size (e.g., like most natural photos).</p>
+</blockquote>
+<p>Once we are done with our convolutional layers, we will get activations of size <code>bs x ch x h x w</code> (batch size, a certain number of channels, height, and width). We want to convert this to a tensor of size <code>bs x ch</code>, so we take the average over the last two dimensions and flatten the trailing 1×1 dimension like we did in our previous model.</p>
+<p>This is different from regular pooling in the sense that those layers will generally take the average (for average pooling) or the maximum (for max pooling) of a window of a given size. For instance, max pooling layers of size 2, which were very popular in older CNNs, reduce the size of our image by half on each dimension by taking the maximum of each 2×2 window (with a stride of 2).</p>
+<p>As before, we can define a <code>Learner</code> with our custom model and then train it on the data we grabbed earlier:</p>
+<div id="cell-16" class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_learner(m):</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> Learner(dls, m, loss_func<span class="op">=</span>nn.CrossEntropyLoss(), metrics<span class="op">=</span>accuracy</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>                  ).to_fp16()</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>learn <span class="op">=</span> get_learner(get_model())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-17" class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>learn.lr_find()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="resnet_files/figure-html/cell-10-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>3e-3 is often a good learning rate for CNNs, and that appears to be the case here too, so let’s try that:</p>
+<div id="cell-19" class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>learn.fit_one_cycle(<span class="dv">5</span>, <span class="fl">3e-3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">epoch</th>
+<th data-quarto-table-cell-role="th">train_loss</th>
+<th data-quarto-table-cell-role="th">valid_loss</th>
+<th data-quarto-table-cell-role="th">accuracy</th>
+<th data-quarto-table-cell-role="th">time</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0</td>
+<td>1.901582</td>
+<td>2.155090</td>
+<td>0.325350</td>
+<td>00:07</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>1.559855</td>
+<td>1.586795</td>
+<td>0.507771</td>
+<td>00:07</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>1.296350</td>
+<td>1.295499</td>
+<td>0.571720</td>
+<td>00:07</td>
+</tr>
+<tr class="even">
+<td>3</td>
+<td>1.144139</td>
+<td>1.139257</td>
+<td>0.639236</td>
+<td>00:07</td>
+</tr>
+<tr class="odd">
+<td>4</td>
+<td>1.049770</td>
+<td>1.092619</td>
+<td>0.659108</td>
+<td>00:07</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>That’s a pretty good start, considering we have to pick the correct one of 10 categories, and we’re training from scratch for just 5 epochs! We can do way better than this using a deeper mode, but just stacking new layers won’t really improve our results (you can try and see for yourself!). To work around this problem, ResNets introduce the idea of <em>skip connections</em>. We’ll explore those and other aspects of ResNets in the next section.</p>
+</section>
+<section id="building-a-modern-cnn-resnet" class="level2" data-number="14.2">
+<h2 data-number="14.2" class="anchored" data-anchor-id="building-a-modern-cnn-resnet"><span class="header-section-number">14.2</span> Building a Modern CNN: ResNet</h2>
+<p>We now have all the pieces we need to build the models we have been using in our computer vision tasks since the beginning of this book: ResNets. We’ll introduce the main idea behind them and show how it improves accuracy on Imagenette compared to our previous model, before building a version with all the recent tweaks.</p>
+<section id="skip-connections" class="level3">
+<h3 class="anchored" data-anchor-id="skip-connections">Skip Connections</h3>
+<p>In 2015, the authors of the ResNet paper noticed something that they found curious. Even after using batchnorm, they saw that a network using more layers was doing less well than a network using fewer layers—and there were no other differences between the models. Most interestingly, the difference was observed not only in the validation set, but also in the training set; so, it wasn’t just a generalization issue, but a training issue. As the paper explains:</p>
+<blockquote class="blockquote">
+<p>Unexpectedly, such degradation is not caused by overfitting, and adding more layers to a suitably deep model leads to higher training error, as [previously reported] and thoroughly verified by our experiments.</p>
+</blockquote>
+<p>This phenomenon was illustrated by the graph in <a href="#fig-resnet-depth" class="quarto-xref">Figure&nbsp;<span>14.1</span></a>, with training error on the left and test error on the right.</p>
+<div id="fig-resnet-depth" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Training of networks of different depth">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-resnet-depth-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/att_00042.png" class="img-fluid figure-img" alt="Training of networks of different depth" width="700">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-resnet-depth-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;14.1: Training of networks of different depth (courtesy of Kaiming He et al.)
+</figcaption>
+</figure>
+</div>
+<p>As the authors mention here, they are not the first people to have noticed this curious fact. But they were the first to make a very important leap:</p>
+<blockquote class="blockquote">
+<p>Let us consider a shallower architecture and its deeper counterpart that adds more layers onto it. There exists a solution by construction to the deeper model: the added layers are identity mapping, and the other layers are copied from the learned shallower model.</p>
+</blockquote>
+<p>As this is an academic paper this process is described in a rather inaccessible way, but the concept is actually very simple: start with a 20-layer neural network that is trained well, and add another 36 layers that do nothing at all (for instance, they could be linear layers with a single weight equal to 1, and bias equal to 0). The result will be a 56-layer network that does exactly the same thing as the 20-layer network, proving that there are always deep networks that should be <em>at least as good</em> as any shallow network. But for some reason, SGD does not seem able to find them.</p>
+<blockquote class="blockquote">
+<p>jargon: Identity mapping: Returning the input without changing it at all. This process is performed by an <em>identity function</em>.</p>
+</blockquote>
+<p>Actually, there is another way to create those extra 36 layers, which is much more interesting. What if we replaced every occurrence of <code>conv(x)</code> with <code>x + conv(x)</code>, where <code>conv</code> is the function from the previous chapter that adds a second convolution, then a batchnorm layer, then a ReLU. Furthermore, recall that batchnorm does <code>gamma*y + beta</code>. What if we initialized <code>gamma</code> to zero for every one of those final batchnorm layers? Then our <code>conv(x)</code> for those extra 36 layers will always be equal to zero, which means <code>x+conv(x)</code> will always be equal to <code>x</code>.</p>
+<p>What has that gained us? The key thing is that those 36 extra layers, as they stand, are an <em>identity mapping</em>, but they have <em>parameters</em>, which means they are <em>trainable</em>. So, we can start with our best 20-layer model, add these 36 extra layers which initially do nothing at all, and then <em>fine-tune the whole 56-layer model</em>. Those extra 36 layers can then learn the parameters that make them most useful.</p>
+<p>The ResNet paper actually proposed a variant of this, which is to instead “skip over” every second convolution, so effectively we get <code>x+conv2(conv1(x))</code>. This is shown by the diagram in <a href="#fig-resnet-block" class="quarto-xref">Figure&nbsp;<span>14.2</span></a> (from the paper).</p>
+<div id="fig-resnet-block" class="preview-image quarto-float quarto-figure quarto-figure-center anchored" alt="A simple ResNet block">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-resnet-block-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/att_00043.png" class="preview-image img-fluid figure-img" alt="A simple ResNet block" width="331">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-resnet-block-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;14.2: A simple ResNet block (courtesy of Kaiming He et al.)
+</figcaption>
+</figure>
+</div>
+<p>That arrow on the right is just the <code>x</code> part of <code>x+conv2(conv1(x))</code>, and is known as the <em>identity branch</em> or <em>skip connection</em>. The path on the left is the <code>conv2(conv1(x))</code> part. You can think of the identity path as providing a direct route from the input to the output.</p>
+<p>In a ResNet, we don’t actually proceed by first training a smaller number of layers, and then adding new layers on the end and fine-tuning. Instead, we use ResNet blocks like the one in <a href="#fig-resnet-block" class="quarto-xref">Figure&nbsp;<span>14.2</span></a> throughout the CNN, initialized from scratch in the usual way, and trained with SGD in the usual way. We rely on the skip connections to make the network easier to train with SGD.</p>
+<p>There’s another (largely equivalent) way to think of these ResNet blocks. This is how the paper describes it:</p>
+<blockquote class="blockquote">
+<p>Instead of hoping each few stacked layers directly fit a desired underlying mapping, we explicitly let these layers fit a residual mapping. Formally, denoting the desired underlying mapping as H(x), we let the stacked nonlinear layers fit another mapping of F(x) := H(x)−x. The original mapping is recast into F(x)+x. We hypothesize that it is easier to optimize the residual mapping than to optimize the original, unreferenced mapping. To the extreme, if an identity mapping were optimal, it would be easier to push the residual to zero than to fit an identity mapping by a stack of nonlinear layers.</p>
+</blockquote>
+<p>Again, this is rather inaccessible prose—so let’s try to restate it in plain English! If the outcome of a given layer is <code>x</code>, when using a ResNet block that returns <code>y = x+block(x)</code> we’re not asking the block to predict <code>y</code>, we are asking it to predict the difference between <code>y</code> and <code>x</code>. So the job of those blocks isn’t to predict certain features, but to minimize the error between <code>x</code> and the desired <code>y</code>. A ResNet is, therefore, good at learning about slight differences between doing nothing and passing though a block of two convolutional layers (with trainable weights). This is how these models got their name: they’re predicting residuals (reminder: “residual” is prediction minus target).</p>
+<p>One key concept that both of these two ways of thinking about ResNets share is the idea of ease of learning. This is an important theme. Recall the universal approximation theorem, which states that a sufficiently large network can learn anything. This is still true, but there turns out to be a very important difference between what a network <em>can learn</em> in principle, and what it is <em>easy for it to learn</em> with realistic data and training regimes. Many of the advances in neural networks over the last decade have been like the ResNet block: the result of realizing how to make something that was always possible actually feasible.</p>
+<blockquote class="blockquote">
+<p>note: True Identity Path: The original paper didn’t actually do the trick of using zero for the initial value of <code>gamma</code> in the last batchnorm layer of each block; that came a couple of years later. So, the original version of ResNet didn’t quite begin training with a truly identity path through the ResNet blocks, but nonetheless having the ability to “navigate through” the skip connections did indeed make it train better. Adding the batchnorm <code>gamma</code> init trick made the models train at even higher learning rates.</p>
+</blockquote>
+<p>Here’s the definition of a simple ResNet block (where <code>norm_type=NormType.BatchZero</code> causes fastai to init the <code>gamma</code> weights of the last batchnorm layer to zero):</p>
+<div id="cell-30" class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> ResBlock(Module):</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, ni, nf):</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.convs <span class="op">=</span> nn.Sequential(</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>            ConvLayer(ni,nf),</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>            ConvLayer(nf,nf, norm_type<span class="op">=</span>NormType.BatchZero))</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, x): <span class="cf">return</span> x <span class="op">+</span> <span class="va">self</span>.convs(x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>There are two problems with this, however: it can’t handle a stride other than 1, and it requires that <code>ni==nf</code>. Stop for a moment to think carefully about why this is.</p>
+<p>The issue is that with a stride of, say, 2 on one of the convolutions, the grid size of the output activations will be half the size on each axis of the input. So then we can’t add that back to <code>x</code> in <code>forward</code> because <code>x</code> and the output activations have different dimensions. The same basic issue occurs if <code>ni!=nf</code>: the shapes of the input and output connections won’t allow us to add them together.</p>
+<p>To fix this, we need a way to change the shape of <code>x</code> to match the result of <code>self.convs</code>. Halving the grid size can be done using an average pooling layer with a stride of 2: that is, a layer that takes 2×2 patches from the input and replaces them with their average.</p>
+<p>Changing the number of channels can be done by using a convolution. We want this skip connection to be as close to an identity map as possible, however, which means making this convolution as simple as possible. The simplest possible convolution is one where the kernel size is 1. That means that the kernel is size <code>ni*nf*1*1</code>, so it’s only doing a dot product over the channels of each input pixel—it’s not combining across pixels at all. This kind of <em>1x1 convolution</em> is very widely used in modern CNNs, so take a moment to think about how it works.</p>
+<blockquote class="blockquote">
+<p>jargon: 1x1 convolution: A convolution with a kernel size of 1.</p>
+</blockquote>
+<p>Here’s a ResBlock using these tricks to handle changing shape in the skip connection:</p>
+<div id="cell-34" class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> _conv_block(ni,nf,stride):</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> nn.Sequential(</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>        ConvLayer(ni, nf, stride<span class="op">=</span>stride),</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>        ConvLayer(nf, nf, act_cls<span class="op">=</span><span class="va">None</span>, norm_type<span class="op">=</span>NormType.BatchZero))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-35" class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> ResBlock(Module):</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, ni, nf, stride<span class="op">=</span><span class="dv">1</span>):</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.convs <span class="op">=</span> _conv_block(ni,nf,stride)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.idconv <span class="op">=</span> noop <span class="cf">if</span> ni<span class="op">==</span>nf <span class="cf">else</span> ConvLayer(ni, nf, <span class="dv">1</span>, act_cls<span class="op">=</span><span class="va">None</span>)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.pool <span class="op">=</span> noop <span class="cf">if</span> stride<span class="op">==</span><span class="dv">1</span> <span class="cf">else</span> nn.AvgPool2d(<span class="dv">2</span>, ceil_mode<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, x):</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> F.relu(<span class="va">self</span>.convs(x) <span class="op">+</span> <span class="va">self</span>.idconv(<span class="va">self</span>.pool(x)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Note that we’re using the <code>noop</code> function here, which simply returns its input unchanged (<em>noop</em> is a computer science term that stands for “no operation”). In this case, <code>idconv</code> does nothing at all if <code>ni==nf</code>, and <code>pool</code> does nothing if <code>stride==1</code>, which is what we wanted in our skip connection.</p>
+<p>Also, you’ll see that we’ve removed the ReLU (<code>act_cls=None</code>) from the final convolution in <code>convs</code> and from <code>idconv</code>, and moved it to <em>after</em> we add the skip connection. The thinking behind this is that the whole ResNet block is like a layer, and you want your activation to be after your layer.</p>
+<p>Let’s replace our <code>block</code> with <code>ResBlock</code>, and try it out:</p>
+<div id="cell-37" class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> block(ni,nf): <span class="cf">return</span> ResBlock(ni, nf, stride<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>learn <span class="op">=</span> get_learner(get_model())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-38" class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>learn.fit_one_cycle(<span class="dv">5</span>, <span class="fl">3e-3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">epoch</th>
+<th data-quarto-table-cell-role="th">train_loss</th>
+<th data-quarto-table-cell-role="th">valid_loss</th>
+<th data-quarto-table-cell-role="th">accuracy</th>
+<th data-quarto-table-cell-role="th">time</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0</td>
+<td>1.973174</td>
+<td>1.845491</td>
+<td>0.373248</td>
+<td>00:08</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>1.678627</td>
+<td>1.778713</td>
+<td>0.439236</td>
+<td>00:08</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>1.386163</td>
+<td>1.596503</td>
+<td>0.507261</td>
+<td>00:08</td>
+</tr>
+<tr class="even">
+<td>3</td>
+<td>1.177839</td>
+<td>1.102993</td>
+<td>0.644841</td>
+<td>00:09</td>
+</tr>
+<tr class="odd">
+<td>4</td>
+<td>1.052435</td>
+<td>1.038013</td>
+<td>0.667771</td>
+<td>00:09</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>It’s not much better. But the whole point of this was to allow us to train <em>deeper</em> models, and we’re not really taking advantage of that yet. To create a model that’s, say, twice as deep, all we need to do is replace our <code>block</code> with two <code>ResBlock</code>s in a row:</p>
+<div id="cell-40" class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> block(ni, nf):</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> nn.Sequential(ResBlock(ni, nf, stride<span class="op">=</span><span class="dv">2</span>), ResBlock(nf, nf))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-41" class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>learn <span class="op">=</span> get_learner(get_model())</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>learn.fit_one_cycle(<span class="dv">5</span>, <span class="fl">3e-3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">epoch</th>
+<th data-quarto-table-cell-role="th">train_loss</th>
+<th data-quarto-table-cell-role="th">valid_loss</th>
+<th data-quarto-table-cell-role="th">accuracy</th>
+<th data-quarto-table-cell-role="th">time</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0</td>
+<td>1.964076</td>
+<td>1.864578</td>
+<td>0.355159</td>
+<td>00:12</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>1.636880</td>
+<td>1.596789</td>
+<td>0.502675</td>
+<td>00:12</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>1.335378</td>
+<td>1.304472</td>
+<td>0.588535</td>
+<td>00:12</td>
+</tr>
+<tr class="even">
+<td>3</td>
+<td>1.089160</td>
+<td>1.065063</td>
+<td>0.663185</td>
+<td>00:12</td>
+</tr>
+<tr class="odd">
+<td>4</td>
+<td>0.942904</td>
+<td>0.963589</td>
+<td>0.692739</td>
+<td>00:12</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Now we’re making good progress!</p>
+<p>The authors of the ResNet paper went on to win the 2015 ImageNet challenge. At the time, this was by far the most important annual event in computer vision. We have already seen another ImageNet winner: the 2013 winners, Zeiler and Fergus. It is interesting to note that in both cases the starting points for the breakthroughs were experimental observations: observations about what layers actually learn, in the case of Zeiler and Fergus, and observations about which kinds of networks can be trained, in the case of the ResNet authors. This ability to design and analyze thoughtful experiments, or even just to see an unexpected result, say “Hmmm, that’s interesting,” and then, most importantly, set about figuring out what on earth is going on, with great tenacity, is at the heart of many scientific discoveries. Deep learning is not like pure mathematics. It is a heavily experimental field, so it’s important to be a strong practitioner, not just a theoretician.</p>
+<p>Since the ResNet was introduced, it’s been widely studied and applied to many domains. One of the most interesting papers, published in 2018, is Hao Li et al.’s <a href="https://arxiv.org/abs/1712.09913">“Visualizing the Loss Landscape of Neural Nets”</a>. It shows that using skip connections helps smooth the loss function, which makes training easier as it avoids falling into a very sharp area. <a href="#fig-resnet-surface" class="quarto-xref">Figure&nbsp;<span>14.3</span></a> shows a stunning picture from the paper, illustrating the difference between the bumpy terrain that SGD has to navigate to optimize a regular CNN (left) versus the smooth surface of a ResNet (right).</p>
+<div id="fig-resnet-surface" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Impact of ResNet on loss landscape">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-resnet-surface-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/att_00044.png" class="img-fluid figure-img" alt="Impact of ResNet on loss landscape" width="600">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-resnet-surface-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;14.3: Impact of ResNet on loss landscape (courtesy of Hao Li et al.)
+</figcaption>
+</figure>
+</div>
+<p>Our first model is already good, but further research has discovered more tricks we can apply to make it better. We’ll look at those next.</p>
+</section>
+<section id="a-state-of-the-art-resnet" class="level3">
+<h3 class="anchored" data-anchor-id="a-state-of-the-art-resnet">A State-of-the-Art ResNet</h3>
+<p>In <a href="https://arxiv.org/abs/1812.01187">“Bag of Tricks for Image Classification with Convolutional Neural Networks”</a>, Tong He et al.&nbsp;study different variations of the ResNet architecture that come at almost no additional cost in terms of number of parameters or computation. By using a tweaked ResNet-50 architecture and Mixup they achieved 94.6% top-5 accuracy on ImageNet, in comparison to 92.2% with a regular ResNet-50 without Mixup. This result is better than that achieved by regular ResNet models that are twice as deep (and twice as slow, and much more likely to overfit).</p>
+<blockquote class="blockquote">
+<p>jargon: top-5 accuracy: A metric testing how often the label we want is in the top 5 predictions of our model. It was used in the ImageNet competition because many of the images contained multiple objects, or contained objects that could be easily confused or may even have been mislabeled with a similar label. In these situations, looking at top-1 accuracy may be inappropriate. However, recently CNNs have been getting so good that top-5 accuracy is nearly 100%, so some researchers are using top-1 accuracy for ImageNet too now.</p>
+</blockquote>
+<p>We’ll use this tweaked version as we scale up to the full ResNet, because it’s substantially better. It differs a little bit from our previous implementation, in that instead of just starting with ResNet blocks, it begins with a few convolutional layers followed by a max pooling layer. This is what the first layers, called the <em>stem</em> of the network, look like:</p>
+<div id="cell-49" class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> _resnet_stem(<span class="op">*</span>sizes):</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> [</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>        ConvLayer(sizes[i], sizes[i<span class="op">+</span><span class="dv">1</span>], <span class="dv">3</span>, stride <span class="op">=</span> <span class="dv">2</span> <span class="cf">if</span> i<span class="op">==</span><span class="dv">0</span> <span class="cf">else</span> <span class="dv">1</span>)</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(sizes)<span class="op">-</span><span class="dv">1</span>)</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    ] <span class="op">+</span> [nn.MaxPool2d(kernel_size<span class="op">=</span><span class="dv">3</span>, stride<span class="op">=</span><span class="dv">2</span>, padding<span class="op">=</span><span class="dv">1</span>)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-50" class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>_resnet_stem(<span class="dv">3</span>,<span class="dv">32</span>,<span class="dv">32</span>,<span class="dv">64</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<pre><code>[ConvLayer(
+   (0): Conv2d(3, 32, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
+   (1): BatchNorm2d(32, eps=1e-05, momentum=0.1)
+   (2): ReLU()
+ ), ConvLayer(
+   (0): Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+   (1): BatchNorm2d(32, eps=1e-05, momentum=0.1)
+   (2): ReLU()
+ ), ConvLayer(
+   (0): Conv2d(32, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+   (1): BatchNorm2d(64, eps=1e-05, momentum=0.1)
+   (2): ReLU()
+ ), MaxPool2d(kernel_size=3, stride=2, padding=1, ceil_mode=False)]</code></pre>
+<blockquote class="blockquote">
+<p>jargon: Stem: The first few layers of a CNN. Generally, the stem has a different structure than the main body of the CNN.</p>
+</blockquote>
+<p>The reason that we have a stem of plain convolutional layers, instead of ResNet blocks, is based on a very important insight about all deep convolutional neural networks: the vast majority of the computation occurs in the early layers. Therefore, we should keep the early layers as fast and simple as possible.</p>
+<p>To see why so much computation occurs in the early layers, consider the very first convolution on a 128-pixel input image. If it is a stride-1 convolution, then it will apply the kernel to every one of the 128×128 pixels. That’s a lot of work! In the later layers, however, the grid size could be as small as 4×4 or even 2×2, so there are far fewer kernel applications to do.</p>
+<p>On the other hand, the first-layer convolution only has 3 input features and 32 output features. Since it is a 3×3 kernel, this is 3×32×3×3 = 864 parameters in the weights. But the last convolution will have 256 input features and 512 output features, resulting in 1,179,648 weights! So the first layers contain the vast majority of the computation, but the last layers contain the vast majority of the parameters.</p>
+<p>A ResNet block takes more computation than a plain convolutional block, since (in the stride-2 case) a ResNet block has three convolutions and a pooling layer. That’s why we want to have plain convolutions to start off our ResNet.</p>
+<p>We’re now ready to show the implementation of a modern ResNet, with the “bag of tricks.” It uses four groups of ResNet blocks, with 64, 128, 256, then 512 filters. Each group starts with a stride-2 block, except for the first one, since it’s just after a <code>MaxPooling</code> layer:</p>
+<div id="cell-54" class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> ResNet(nn.Sequential):</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, n_out, layers, expansion<span class="op">=</span><span class="dv">1</span>):</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>        stem <span class="op">=</span> _resnet_stem(<span class="dv">3</span>,<span class="dv">32</span>,<span class="dv">32</span>,<span class="dv">64</span>)</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.block_szs <span class="op">=</span> [<span class="dv">64</span>, <span class="dv">64</span>, <span class="dv">128</span>, <span class="dv">256</span>, <span class="dv">512</span>]</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>,<span class="dv">5</span>): <span class="va">self</span>.block_szs[i] <span class="op">*=</span> expansion</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>        blocks <span class="op">=</span> [<span class="va">self</span>._make_layer(<span class="op">*</span>o) <span class="cf">for</span> o <span class="kw">in</span> <span class="bu">enumerate</span>(layers)]</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>(<span class="op">*</span>stem, <span class="op">*</span>blocks,</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>                         nn.AdaptiveAvgPool2d(<span class="dv">1</span>), Flatten(),</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>                         nn.Linear(<span class="va">self</span>.block_szs[<span class="op">-</span><span class="dv">1</span>], n_out))</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> _make_layer(<span class="va">self</span>, idx, n_layers):</span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>        stride <span class="op">=</span> <span class="dv">1</span> <span class="cf">if</span> idx<span class="op">==</span><span class="dv">0</span> <span class="cf">else</span> <span class="dv">2</span></span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>        ch_in,ch_out <span class="op">=</span> <span class="va">self</span>.block_szs[idx:idx<span class="op">+</span><span class="dv">2</span>]</span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> nn.Sequential(<span class="op">*</span>[</span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>            ResBlock(ch_in <span class="cf">if</span> i<span class="op">==</span><span class="dv">0</span> <span class="cf">else</span> ch_out, ch_out, stride <span class="cf">if</span> i<span class="op">==</span><span class="dv">0</span> <span class="cf">else</span> <span class="dv">1</span>)</span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n_layers)</span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>        ])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The <code>_make_layer</code> function is just there to create a series of <code>n_layers</code> blocks. The first one is going from <code>ch_in</code> to <code>ch_out</code> with the indicated <code>stride</code> and all the others are blocks of stride 1 with <code>ch_out</code> to <code>ch_out</code> tensors. Once the blocks are defined, our model is purely sequential, which is why we define it as a subclass of <code>nn.Sequential</code>. (Ignore the <code>expansion</code> parameter for now; we’ll discuss it in the next section. For now, it’ll be <code>1</code>, so it doesn’t do anything.)</p>
+<p>The various versions of the models (ResNet-18, -34, -50, etc.) just change the number of blocks in each of those groups. This is the definition of a ResNet-18:</p>
+<div id="cell-56" class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>rn <span class="op">=</span> ResNet(dls.c, [<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Let’s train it for a little bit and see how it fares compared to the previous model:</p>
+<div id="cell-58" class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>learn <span class="op">=</span> get_learner(rn)</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>learn.fit_one_cycle(<span class="dv">5</span>, <span class="fl">3e-3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">epoch</th>
+<th data-quarto-table-cell-role="th">train_loss</th>
+<th data-quarto-table-cell-role="th">valid_loss</th>
+<th data-quarto-table-cell-role="th">accuracy</th>
+<th data-quarto-table-cell-role="th">time</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0</td>
+<td>1.673882</td>
+<td>1.828394</td>
+<td>0.413758</td>
+<td>00:13</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>1.331675</td>
+<td>1.572685</td>
+<td>0.518217</td>
+<td>00:13</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>1.087224</td>
+<td>1.086102</td>
+<td>0.650701</td>
+<td>00:13</td>
+</tr>
+<tr class="even">
+<td>3</td>
+<td>0.900428</td>
+<td>0.968219</td>
+<td>0.684331</td>
+<td>00:12</td>
+</tr>
+<tr class="odd">
+<td>4</td>
+<td>0.760280</td>
+<td>0.782558</td>
+<td>0.757197</td>
+<td>00:12</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Even though we have more channels (and our model is therefore even more accurate), our training is just as fast as before, thanks to our optimized stem.</p>
+<p>To make our model deeper without taking too much compute or memory, we can use another kind of layer introduced by the ResNet paper for ResNets with a depth of 50 or more: the bottleneck layer.</p>
+</section>
+<section id="bottleneck-layers" class="level3">
+<h3 class="anchored" data-anchor-id="bottleneck-layers">Bottleneck Layers</h3>
+<p>Instead of stacking two convolutions with a kernel size of 3, bottleneck layers use three different convolutions: two 1×1 (at the beginning and the end) and one 3×3, as shown on the right in <a href="#fig-resnet-compare" class="quarto-xref">Figure&nbsp;<span>14.4</span></a>.</p>
+<div id="fig-resnet-compare" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Comparison of regular and bottleneck ResNet blocks">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-resnet-compare-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/att_00045.png" class="img-fluid figure-img" alt="Comparison of regular and bottleneck ResNet blocks" width="550">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-resnet-compare-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;14.4: Comparison of regular and bottleneck ResNet blocks (courtesy of Kaiming He et al.)
+</figcaption>
+</figure>
+</div>
+<p>Why is that useful? 1×1 convolutions are much faster, so even if this seems to be a more complex design, this block executes faster than the first ResNet block we saw. This then lets us use more filters: as we see in the illustration, the number of filters in and out is 4 times higher (256 instead of 64) diminish then restore the number of channels (hence the name bottleneck). The overall impact is that we can use more filters in the same amount of time.</p>
+<p>Let’s try replacing our <code>ResBlock</code> with this bottleneck design:</p>
+<div id="cell-64" class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> _conv_block(ni,nf,stride):</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> nn.Sequential(</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>        ConvLayer(ni, nf<span class="op">//</span><span class="dv">4</span>, <span class="dv">1</span>),</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>        ConvLayer(nf<span class="op">//</span><span class="dv">4</span>, nf<span class="op">//</span><span class="dv">4</span>, stride<span class="op">=</span>stride), </span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>        ConvLayer(nf<span class="op">//</span><span class="dv">4</span>, nf, <span class="dv">1</span>, act_cls<span class="op">=</span><span class="va">None</span>, norm_type<span class="op">=</span>NormType.BatchZero))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We’ll use this to create a ResNet-50 with group sizes of <code>(3,4,6,3)</code>. We now need to pass <code>4</code> in to the <code>expansion</code> parameter of <code>ResNet</code>, since we need to start with four times less channels and we’ll end with four times more channels.</p>
+<p>Deeper networks like this don’t generally show improvements when training for only 5 epochs, so we’ll bump it up to 20 epochs this time to make the most of our bigger model. And to really get great results, let’s use bigger images too:</p>
+<div id="cell-66" class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>dls <span class="op">=</span> get_data(URLs.IMAGENETTE_320, presize<span class="op">=</span><span class="dv">320</span>, resize<span class="op">=</span><span class="dv">224</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We don’t have to do anything to account for the larger 224-pixel images; thanks to our fully convolutional network, it just works. This is also why we were able to do <em>progressive resizing</em> earlier in the book—the models we used were fully convolutional, so we were even able to fine-tune models trained with different sizes. We can now train our model and see the effects:</p>
+<div id="cell-68" class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>rn <span class="op">=</span> ResNet(dls.c, [<span class="dv">3</span>,<span class="dv">4</span>,<span class="dv">6</span>,<span class="dv">3</span>], <span class="dv">4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-69" class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>learn <span class="op">=</span> get_learner(rn)</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>learn.fit_one_cycle(<span class="dv">20</span>, <span class="fl">3e-3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">epoch</th>
+<th data-quarto-table-cell-role="th">train_loss</th>
+<th data-quarto-table-cell-role="th">valid_loss</th>
+<th data-quarto-table-cell-role="th">accuracy</th>
+<th data-quarto-table-cell-role="th">time</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0</td>
+<td>1.613448</td>
+<td>1.473355</td>
+<td>0.514140</td>
+<td>00:31</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>1.359604</td>
+<td>2.050794</td>
+<td>0.397452</td>
+<td>00:31</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>1.253112</td>
+<td>4.511735</td>
+<td>0.387006</td>
+<td>00:31</td>
+</tr>
+<tr class="even">
+<td>3</td>
+<td>1.133450</td>
+<td>2.575221</td>
+<td>0.396178</td>
+<td>00:31</td>
+</tr>
+<tr class="odd">
+<td>4</td>
+<td>1.054752</td>
+<td>1.264525</td>
+<td>0.613758</td>
+<td>00:32</td>
+</tr>
+<tr class="even">
+<td>5</td>
+<td>0.927930</td>
+<td>2.670484</td>
+<td>0.422675</td>
+<td>00:32</td>
+</tr>
+<tr class="odd">
+<td>6</td>
+<td>0.838268</td>
+<td>1.724588</td>
+<td>0.528662</td>
+<td>00:32</td>
+</tr>
+<tr class="even">
+<td>7</td>
+<td>0.748289</td>
+<td>1.180668</td>
+<td>0.666497</td>
+<td>00:31</td>
+</tr>
+<tr class="odd">
+<td>8</td>
+<td>0.688637</td>
+<td>1.245039</td>
+<td>0.650446</td>
+<td>00:32</td>
+</tr>
+<tr class="even">
+<td>9</td>
+<td>0.645530</td>
+<td>1.053691</td>
+<td>0.674904</td>
+<td>00:31</td>
+</tr>
+<tr class="odd">
+<td>10</td>
+<td>0.593401</td>
+<td>1.180786</td>
+<td>0.676433</td>
+<td>00:32</td>
+</tr>
+<tr class="even">
+<td>11</td>
+<td>0.536634</td>
+<td>0.879937</td>
+<td>0.713885</td>
+<td>00:32</td>
+</tr>
+<tr class="odd">
+<td>12</td>
+<td>0.479208</td>
+<td>0.798356</td>
+<td>0.741656</td>
+<td>00:32</td>
+</tr>
+<tr class="even">
+<td>13</td>
+<td>0.440071</td>
+<td>0.600644</td>
+<td>0.806879</td>
+<td>00:32</td>
+</tr>
+<tr class="odd">
+<td>14</td>
+<td>0.402952</td>
+<td>0.450296</td>
+<td>0.858599</td>
+<td>00:32</td>
+</tr>
+<tr class="even">
+<td>15</td>
+<td>0.359117</td>
+<td>0.486126</td>
+<td>0.846369</td>
+<td>00:32</td>
+</tr>
+<tr class="odd">
+<td>16</td>
+<td>0.313642</td>
+<td>0.442215</td>
+<td>0.861911</td>
+<td>00:32</td>
+</tr>
+<tr class="even">
+<td>17</td>
+<td>0.294050</td>
+<td>0.485967</td>
+<td>0.853503</td>
+<td>00:32</td>
+</tr>
+<tr class="odd">
+<td>18</td>
+<td>0.270583</td>
+<td>0.408566</td>
+<td>0.875924</td>
+<td>00:32</td>
+</tr>
+<tr class="even">
+<td>19</td>
+<td>0.266003</td>
+<td>0.411752</td>
+<td>0.872611</td>
+<td>00:33</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>We’re getting a great result now! Try adding Mixup, and then training this for a hundred epochs while you go get lunch. You’ll have yourself a very accurate image classifier, trained from scratch.</p>
+<p>The bottleneck design we’ve shown here is typically only used in ResNet-50, -101, and -152 models. ResNet-18 and -34 models usually use the non-bottleneck design seen in the previous section. However, we’ve noticed that the bottleneck layer generally works better even for the shallower networks. This just goes to show that the little details in papers tend to stick around for years, even if they’re actually not quite the best design! Questioning assumptions and “stuff everyone knows” is always a good idea, because this is still a new field, and there are lots of details that aren’t always done well.</p>
+</section>
+</section>
+<section id="conclusion" class="level2" data-number="14.3">
+<h2 data-number="14.3" class="anchored" data-anchor-id="conclusion"><span class="header-section-number">14.3</span> Conclusion</h2>
+<p>You have now seen how the models we have been using for computer vision since the first chapter are built, using skip connections to allow deeper models to be trained. Even if there has been a lot of research into better architectures, they all use one version or another of this trick, to make a direct path from the input to the end of the network. When using transfer learning, the ResNet is the pretrained model. In the next chapter, we will look at the final details of how the models we actually used were built from it.</p>
+</section>
+<section id="questionnaire" class="level2" data-number="14.4">
+<h2 data-number="14.4" class="anchored" data-anchor-id="questionnaire"><span class="header-section-number">14.4</span> Questionnaire</h2>
+<ol type="1">
+<li>How did we get to a single vector of activations in the CNNs used for MNIST in previous chapters? Why isn’t that suitable for Imagenette?</li>
+<li>What do we do for Imagenette instead?</li>
+<li>What is “adaptive pooling”?</li>
+<li>What is “average pooling”?</li>
+<li>Why do we need <code>Flatten</code> after an adaptive average pooling layer?</li>
+<li>What is a “skip connection”?</li>
+<li>Why do skip connections allow us to train deeper models?</li>
+<li>What does <a href="#fig-resnet-depth" class="quarto-xref">Figure&nbsp;<span>14.1</span></a> show? How did that lead to the idea of skip connections?</li>
+<li>What is “identity mapping”?</li>
+<li>What is the basic equation for a ResNet block (ignoring batchnorm and ReLU layers)?</li>
+<li>What do ResNets have to do with residuals?</li>
+<li>How do we deal with the skip connection when there is a stride-2 convolution? How about when the number of filters changes?</li>
+<li>How can we express a 1×1 convolution in terms of a vector dot product?</li>
+<li>Create a <code>1x1 convolution</code> with <code>F.conv2d</code> or <code>nn.Conv2d</code> and apply it to an image. What happens to the <code>shape</code> of the image?</li>
+<li>What does the <code>noop</code> function return?</li>
+<li>Explain what is shown in <a href="#fig-resnet-surface" class="quarto-xref">Figure&nbsp;<span>14.3</span></a>.</li>
+<li>When is top-5 accuracy a better metric than top-1 accuracy?</li>
+<li>What is the “stem” of a CNN?</li>
+<li>Why do we use plain convolutions in the CNN stem, instead of ResNet blocks?</li>
+<li>How does a bottleneck block differ from a plain ResNet block?</li>
+<li>Why is a bottleneck block faster?</li>
+<li>How do fully convolutional nets (and nets with adaptive pooling in general) allow for progressive resizing?</li>
+</ol>
+<section id="further-research" class="level3">
+<h3 class="anchored" data-anchor-id="further-research">Further Research</h3>
+<ol type="1">
+<li>Try creating a fully convolutional net with adaptive average pooling for MNIST (note that you’ll need fewer stride-2 layers). How does it compare to a network without such a pooling layer?</li>
+<li>In <a href="foundations.html" class="quarto-xref"><span>Chapter 17</span></a> we introduce <em>Einstein summation notation</em>. Skip ahead to see how this works, and then write an implementation of the 1×1 convolution operation using <code>torch.einsum</code>. Compare it to the same operation using <code>torch.conv2d</code>.</li>
+<li>Write a “top-5 accuracy” function using plain PyTorch or plain Python.</li>
+<li>Train a model on Imagenette for more epochs, with and without label smoothing. Take a look at the Imagenette leaderboards and see how close you can get to the best results shown. Read the linked pages describing the leading approaches.</li>
+</ol>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/fastai\.github\.io\/fastbook2e");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./convolutions.html" class="pagination-link" aria-label="Convolutional Neural Networks">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Convolutional Neural Networks</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./book15.html" class="pagination-link" aria-label="*Application Architectures Deep Dive*">
+        <span class="nav-page-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title"><em>Application Architectures Deep Dive</em></span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
